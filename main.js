@@ -33,47 +33,67 @@ const Deck = (function () {
 })();
 
 const Table = (function () {
+  const _dealer = new Player("Dealer");
   const _players = [];
 
   return {
-    seatPlayer(){_players.push(new Player(`player${_players.length+1}`));},
-    dealAll(num){
-      let playerCount = _players.length;
-      let totCards = num * playerCount;
-      while(totCards !== 0){
-        _players[totCards % playerCount].dealCard();
-        totCards--;
+    get player () {return _players;},
+    get dealer () {return _dealer;},
+
+    seatPlayer () {_players.push(new Player(`player${_players.length+1}`));},
+    dealAll (num) {
+      const playerCount = _players.length; //total players plus dealer
+      let cardsDealt = 0;
+      while(cardsDealt < num){
+        for(let i = 0; i < playerCount; i++){
+          _players[i].dealCard();
+        }
+        _dealer.dealCard();
+        cardsDealt++;
       }
     },
-    get players(){return _players;},
-
-
   }
 })();
 
 const GameDirector = (function () {
   return{
-    startNewGame = () => {
-    //shuffle deck
-    //seat players
-    //deal all players two cards
-    //evaluate values with in hands
-    //--if BlackJack return 'WIN' to player
-    //--if no BlackJack return to player; "HIT", or "STAY"
-    //valuate for bust if not return to last step.
+    startNewGame () {
+      //shuffle deck
+      Deck.shuffle();
+      //seat two players
+      Table.seatPlayer();
+      //deal all players two cards
+      Table.dealAll(2);
+      //for each player; check handValue;
+      for (let i = 0; i < Table.Player.length; i++){
+        //--if "BlackJack" check dealer handValue;
+        if(Table.Player[i].handValue == "BlackJack") {
+          //--if "BlackJack" run push;
+          if (Table.dealer.handValue == "BlackJack")
+            this.push(i);
+          //--else run blackJack;
+          this.blackJack(i);
+        }
+      }
+      //--if no BlackJack promt "HIT", or "STAY"
+
+      //evaluate for bust if not return to last step.
     },
-    blackJack = () => {
+    blackJack () {
       //if dealer does not have blackjack the player wins at 3 to 2 
       //promt for a new hand
     },
-    dealersTurn = () => {
+    dealersTurn () {
       //evaluate hand value
       //if <= 16 && not bust hit and return to last step.
       //evaluate all hands against dealers
     },
-    win = () => {},
-    lose = () => {},
-    push = () => {}
+    win () {
+    },
+    lose () {      
+    },
+    push () {      
+    }
   }
 })();
 
@@ -112,6 +132,9 @@ class Player {
         throw new Error("Unable to evaluate card value");
       }
       value += cardValue;
+      //if i(number of cards) == 1 (two cards), and the value == 21; return blackJack
+      // if (i == 1 && value == 21)
+      //   return "BlackJack"
     }
     if (value > 21 && aceCounter > 0){ 
       for (let i = 0; i < aceCounter && value > 21; i++){
@@ -128,16 +151,3 @@ class Player {
   bust(){}
   blackJack(){}
 }
-
-Deck.shuffle();
-Table.seatPlayer();
-Table.seatPlayer();
-Table.dealAll(2);
-Table.players[0].handValue
-Table.players[1].handValue
-Table.dealAll(1);
-Table.players[0].handValue
-Table.players[1].handValue
-Table.dealAll(1);
-Table.players[0].handValue
-Table.players[1].handValue
