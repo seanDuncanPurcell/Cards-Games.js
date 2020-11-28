@@ -1,7 +1,18 @@
-
+const userInterface_BJ = (function () {
+  return {
+    buildTable () {},
+    setHandCounters () {},
+    setPlayerWallets () {},
+    promtBet() {},
+    promtHitOrPass () {},
+    promtNextHand () {},
+    displayWinScreen () {},
+    displayLoseScreen () {},
+    displayPushScreen () {}
+  }
+})();
 
 const Deck = (function () {
-
   const _standardDeck = ["c2", "c3", "c4", "c5", "c6", "c7", "c8", "c9", "c10", "cJ", "cQ", "cK", "cA" 
     ,"s2", "s3", "s4", "s5", "s6", "s7", "s8", "s9", "s10", "sJ", "sQ", "sK", "sA" 
     ,"h2", "h3", "h4", "h5", "h6", "h7", "h8", "h9", "h10", "hJ", "hQ", "hK", "hA" 
@@ -79,6 +90,9 @@ const GameDirector = (function () {
 
       //evaluate for bust if not return to last step.
     },
+    nextHand () {
+      //clear table and hands, but save players and wallets
+    },
     blackJack () {
       //if dealer does not have blackjack the player wins at 3 to 2 
       //promt for a new hand
@@ -89,10 +103,18 @@ const GameDirector = (function () {
       //evaluate all hands against dealers
     },
     win () {
+      //add bet amount to player wallet
+      //display winscreen
+      //promt next hand
     },
-    lose () {      
+    lose () {    
+      //remove bet amount from player wallet
+      //display lose screen
+      //promt next hand  
     },
-    push () {      
+    push () {
+      //display push screen
+      //promt next hand      
     }
   }
 })();
@@ -101,11 +123,7 @@ class Player {
   constructor(name){
     this.cards = [];
     this.name = name;
-  }
-  dealCard(){
-    let cardDealt = Deck.deal();
-    this.cards.push(cardDealt);
-    console.log(cardDealt + " dealt to " + this.name);
+    this.wallet = 500;
   }
   get handValue() {
     let aceCounter = 0; //tracks howmany aces are in hand so the value can be reduces if nessicary 
@@ -145,9 +163,10 @@ class Player {
     console.log(`${logString} = ${value} AceCounter = ${aceCounter}`);
     return value;
   };
-  stay(){}
-  split(){}
+  dealCard(){
+    let cardDealt = Deck.deal();
+    this.cards.push(cardDealt);
+    console.log(cardDealt + " dealt to " + this.name);
+  }
   clearHand () {this.cards = []}
-  bust(){}
-  blackJack(){}
 }
