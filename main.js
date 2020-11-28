@@ -1,11 +1,12 @@
 
 
 const Deck = (function () {
+
   const _standardDeck = ["c2", "c3", "c4", "c5", "c6", "c7", "c8", "c9", "c10", "cJ", "cQ", "cK", "cA" 
     ,"s2", "s3", "s4", "s5", "s6", "s7", "s8", "s9", "s10", "sJ", "sQ", "sK", "sA" 
     ,"h2", "h3", "h4", "h5", "h6", "h7", "h8", "h9", "h10", "hJ", "hQ", "hK", "hA" 
     ,"d2", "d3", "d4", "d5", "d6", "d7", "d8", "d9", "d10", "dJ", "dQ", "dK", "dA" 
-    ]; //Suits; Clubs = C, Spades = S, Harts = H, Dimonds = D
+  ]; //Suits; Clubs = C, Spades = S, Harts = H, Dimonds = D
   let _cards = [0];
 
   return {
@@ -25,13 +26,54 @@ const Deck = (function () {
         _cards[randomIndex] = temporaryValue;
       }
     },
-
     deal () {return _cards.pop();},
-
     get report () {return _cards;},
-
     get deckValues() {return _standardDeck;}
+  }
+})();
 
+const Table = (function () {
+  const _players = [];
+
+  return {
+    seatPlayer(){_players.push(new Player(`player${_players.length+1}`));},
+    dealAll(num){
+      let playerCount = _players.length;
+      let totCards = num * playerCount;
+      while(totCards !== 0){
+        _players[totCards % playerCount].dealCard();
+        totCards--;
+      }
+    },
+    get players(){return _players;},
+
+
+  }
+})();
+
+const GameDirector = (function () {
+  return{
+    startNewGame = () => {
+    //shuffle deck
+    //seat players
+    //deal all players two cards
+    //evaluate values with in hands
+    //--if BlackJack return 'WIN' to player
+    //--if no BlackJack return to player; "HIT", or "STAY"
+    //valuate for bust if not return to last step.
+    },
+    blackJack = () => {
+      //if dealer does not have blackjack the player wins at 3 to 2 
+      //promt for a new hand
+    },
+    dealersTurn = () => {
+      //evaluate hand value
+      //if <= 16 && not bust hit and return to last step.
+      //evaluate all hands against dealers
+    },
+    win = () => {},
+    lose = () => {},
+    push = () => {}
   }
 })();
 
@@ -86,25 +128,6 @@ class Player {
   bust(){}
   blackJack(){}
 }
-
-const Table = (function () {
-  const _players = [];
-  return {
-    seatPlayer(){_players.push(new Player(`player${_players.length+1}`));},
-    dealAll(num){
-      let playerCount = _players.length;
-      let totCards = num * playerCount;
-      while(totCards !== 0){
-        _players[totCards % playerCount].dealCard();
-        totCards--;
-      }
-    },
-    get players(){return _players;},
-
-
-  }
-})();
-
 
 Deck.shuffle();
 Table.seatPlayer();
