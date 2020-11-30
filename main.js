@@ -1,3 +1,56 @@
+
+class Player {
+  constructor(name){
+    this.cards = [];
+    this.name = name;
+    this.wallet = 500;
+  }
+  get handValue() {
+    let aceCounter = 0; //tracks howmany aces are in hand so the value can be reduces if nessicary 
+    let value = 0; //accumulates the values of all cards for return.
+    let cardFactor = 13; //represents the 13 distince cards in each suit
+    let logString = "";
+    for (let i = 0; i < this.cards.length; i++){ //for each card in hand
+      let cardValue;
+      let tempIndex = Deck.deckValues.indexOf(this.cards[i]) + 1; //find the index of the curent cards value in the sandard deck blue print with an offset from zero to one based counting.
+      let cardIndex = (tempIndex % cardFactor) + 1; //returns a consistens value for all 2s, 3, 4, Js, Qs, ect...
+      if (cardIndex > 1 && cardIndex < 11){
+        cardValue = cardIndex; //number cards are valued at their number
+        logString += (" + " + cardValue.toString());
+      }
+      else if (cardIndex >= 11 && cardIndex <= 13){
+        cardValue = 10; //face cards are valued at 10
+        logString += (" + " + cardValue.toString());
+      }
+      else if (cardIndex == 1){
+        aceCounter++;
+        cardValue = 11; //aces are valued at 11 but will be reduced to 1 if the player busts.
+        logString += (" + " + cardValue.toString());
+      } else {
+        throw new Error("Unable to evaluate card value");
+      }
+      value += cardValue;
+      //if i(number of cards) == 1 (two cards), and the value == 21; return blackJack
+      // if (i == 1 && value == 21)
+      //   return "BlackJack"
+    }
+    if (value > 21 && aceCounter > 0){ 
+      for (let i = 0; i < aceCounter && value > 21; i++){
+        value - 10;
+        logString += " - 10";
+      }
+    }
+    console.log(`${logString} = ${value} AceCounter = ${aceCounter}`);
+    return value;
+  };
+  dealCard(){
+    let cardDealt = Deck.deal();
+    this.cards.push(cardDealt);
+    console.log(cardDealt + " dealt to " + this.name);
+  }
+  clearHand () {this.cards = []}
+}
+
 const userInterface_BJ = (function () {
   return {
     buildTable () {},
@@ -118,55 +171,3 @@ const GameDirector = (function () {
     }
   }
 })();
-
-class Player {
-  constructor(name){
-    this.cards = [];
-    this.name = name;
-    this.wallet = 500;
-  }
-  get handValue() {
-    let aceCounter = 0; //tracks howmany aces are in hand so the value can be reduces if nessicary 
-    let value = 0; //accumulates the values of all cards for return.
-    let cardFactor = 13; //represents the 13 distince cards in each suit
-    let logString = "";
-    for (let i = 0; i < this.cards.length; i++){ //for each card in hand
-      let cardValue;
-      let tempIndex = Deck.deckValues.indexOf(this.cards[i]) + 1; //find the index of the curent cards value in the sandard deck blue print with an offset from zero to one based counting.
-      let cardIndex = (tempIndex % cardFactor) + 1; //returns a consistens value for all 2s, 3, 4, Js, Qs, ect...
-      if (cardIndex > 1 && cardIndex < 11){
-        cardValue = cardIndex; //number cards are valued at their number
-        logString += (" + " + cardValue.toString());
-      }
-      else if (cardIndex >= 11 && cardIndex <= 13){
-        cardValue = 10; //face cards are valued at 10
-        logString += (" + " + cardValue.toString());
-      }
-      else if (cardIndex == 1){
-        aceCounter++;
-        cardValue = 11; //aces are valued at 11 but will be reduced to 1 if the player busts.
-        logString += (" + " + cardValue.toString());
-      } else {
-        throw new Error("Unable to evaluate card value");
-      }
-      value += cardValue;
-      //if i(number of cards) == 1 (two cards), and the value == 21; return blackJack
-      // if (i == 1 && value == 21)
-      //   return "BlackJack"
-    }
-    if (value > 21 && aceCounter > 0){ 
-      for (let i = 0; i < aceCounter && value > 21; i++){
-        value - 10;
-        logString += " - 10";
-      }
-    }
-    console.log(`${logString} = ${value} AceCounter = ${aceCounter}`);
-    return value;
-  };
-  dealCard(){
-    let cardDealt = Deck.deal();
-    this.cards.push(cardDealt);
-    console.log(cardDealt + " dealt to " + this.name);
-  }
-  clearHand () {this.cards = []}
-}
