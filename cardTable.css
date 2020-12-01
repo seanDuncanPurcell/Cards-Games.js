@@ -4,7 +4,7 @@
 }
 #table_top {
   position: relative;
-  width: 100%;
+  width: auto;
   height: 90vh;
   display: grid;
   grid-template-columns: 1fr;
@@ -13,10 +13,25 @@
   background-color: khaki;
 }
 
-#table_top > div {
+.cover {  
+  display: none;
+  position: absolute;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+}
+
+.playerArea  {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+}
+
+.hand {
   border: 1px solid red;
   margin: 2px;
-  width: auto;
+  width: fit-content;
+  min-width: 400px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -38,4 +53,17 @@
 .card img {  
   height: 14vw;
   width: 9vw;
+}
+
+#sideControl {
+  padding: 20px;
+}
+#sideControl > button {
+  display: block;
+  height: 30px;
+  width: 60px;
+  margin: 10px;
+}
+#sideControl > em, p {
+  display: inline;
 }
