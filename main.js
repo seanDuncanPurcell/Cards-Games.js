@@ -51,25 +51,11 @@ class Player {
   clearHand () {this.cards = []}
 }
 
-const userInterface_BJ = (function () {
-  return {
-    buildTable () {},
-    setHandCounters () {},
-    setPlayerWallets () {},
-    promtBet() {},
-    promtHitOrPass () {},
-    promtNextHand () {},
-    displayWinScreen () {},
-    displayLoseScreen () {},
-    displayPushScreen () {}
-  }
-})();
-
 const Deck = (function () {
-  const _standardDeck = ["c2", "c3", "c4", "c5", "c6", "c7", "c8", "c9", "c10", "cJ", "cQ", "cK", "cA" 
-    ,"s2", "s3", "s4", "s5", "s6", "s7", "s8", "s9", "s10", "sJ", "sQ", "sK", "sA" 
-    ,"h2", "h3", "h4", "h5", "h6", "h7", "h8", "h9", "h10", "hJ", "hQ", "hK", "hA" 
-    ,"d2", "d3", "d4", "d5", "d6", "d7", "d8", "d9", "d10", "dJ", "dQ", "dK", "dA" 
+  const _standardDeck = ["2C", "3C", "4C", "5C", "6C", "7C", "8C", "9C", "10C", "JC", "QC", "KC", "AC" 
+    ,"2S", "3S", "4S", "5S", "6S", "7S", "8S", "9S", "10S", "JS", "QS", "KS", "AS" 
+    ,"2H", "3H", "4H", "5H", "6H", "7H", "8H", "9H", "10H", "JH", "QH", "KH", "AH" 
+    ,"2D", "3D", "4D", "5D", "6D", "7D", "8D", "9D", "10D", "JD", "QD", "KD", "AD" 
   ]; //Suits; Clubs = C, Spades = S, Harts = H, Dimonds = D
   let _cards = [0];
 
@@ -119,26 +105,65 @@ const Table = (function () {
   }
 })();
 
-const GameDirector = (function () {
-  return{
-    startNewGame () {
-      //shuffle deck
-      Deck.shuffle();
-      //seat two players
-      Table.seatPlayer();
-      //deal all players two cards
-      Table.dealAll(2);
-      //for each player; check handValue;
-      for (let i = 0; i < Table.Player.length; i++){
-        //--if "BlackJack" check dealer handValue;
-        if(Table.Player[i].handValue == "BlackJack") {
-          //--if "BlackJack" run push;
-          if (Table.dealer.handValue == "BlackJack")
-            this.push(i);
-          //--else run blackJack;
-          this.blackJack(i);
-        }
+const userIf_BJ = (function () { //User Interface director
+  const wallet = document.getElementById("playerWallet");
+  const scoreHolders = document.getElementsByClassName("scoureHolder");
+  const hands = document.getElementsByClassName("hand");
+  const newGameBt = document.getElementById("newGame")
+  function newCard (suit) {
+    let card = document.createElement("div");
+    let img = document.createElement("img");
+    card.className = "card";
+    img.src = `./img/${suit}.svg`;
+    card.appendChild(img);
+    return card;
+  }
+  return {
+    setHandScore () {
+      const players = [Table.dealer, ...Table.player];
+      for(let i = 0; i < players.length; i++){
+        scoreHolders[i].innerHTML = players[i].handValue;
       }
+    },
+    setPlayerWallets () {wallet.innerHTML = Table.player[0].wallet;},    
+    dealCards() {
+      const players = [Table.dealer, ...Table.player];
+      players.forEach((player, index) => {
+        for (suit of player.cards){
+          hands[index].appendChild(newCard(suit));
+        }
+      });
+    },
+    hideCover(element) {
+      element.parentElement.style.display = "none";
+    },
+  }
+})();
+
+const GameDirector = (function () {
+  dealCards = (number = 1) => {
+    Table.dealAll(number);
+    userIf_BJ.dealCards();
+    userIf_BJ.setHandScore();
+  };
+  return{
+    startNewGame (element) {
+      Deck.shuffle();
+      Table.seatPlayer();
+      userIf_BJ.setPlayerWallets();
+      userIf_BJ.hideCover(element);
+      dealCards(2);
+      //for each player; check handValue;
+      // for (let i = 0; i < Table.player.length; i++){
+      //   //--if "BlackJack" check dealer handValue;
+      //   if(Table.Player[i].handValue == "BlackJack") {
+      //     //--if "BlackJack" run push;
+      //     if (Table.dealer.handValue == "BlackJack")
+      //       this.push(i);
+      //     //--else run blackJack;
+      //     this.blackJack(i);
+      //   }
+      // }
       //--if no BlackJack promt "HIT", or "STAY"
 
       //evaluate for bust if not return to last step.
@@ -171,3 +196,4 @@ const GameDirector = (function () {
     }
   }
 })();
+

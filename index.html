@@ -9,38 +9,25 @@
 <body>
   <div id="table_top">
     <span class="playerArea">
-      <span class="cover">
-        
+      <span id="newGame" class="cover">
+        <button onclick="GameDirector.startNewGame(this)">
+          Click to start a new game
+        </button>
       </span>
       <div></div>
       <div class="hand">
-        <div class="card">
-          <img src="./img/2C.svg" alt="Two of Clubs">
-        </div>
-        <div class="card">
-          <img src="./img/2C.svg" alt="Two of Clubs">
-        </div>
-        <div class="card">
-          <img src="./img/2C.svg" alt="Two of Clubs">
-        </div>
       </div>
       <div id="sideControl">
-        <em>Score: </em><p id="scoreHolder">000</p>
+        <em>Score: </em> <p class="scoureHolder">000</p>
       </div>
     </span>
     <span></span>
     <span class="playerArea">
       <div></div>
       <div class="hand">
-        <div class="card">
-          <img src="./img/2C.svg" alt="Two of Clubs">
-        </div>
-        <div class="card">
-          <img src="./img/2C.svg" alt="Two of Clubs">
-        </div>
       </div>
       <div id="sideControl">
-        <em>Score: </em><p id="scoreHolder">000</p> <br>
+        <em>Score: </em> <p class="scoureHolder">000</p> <br>
         <p>$</p><p id="playerWallet">000.00</p>
         <button>Hit</button>
         <button>Stay</button>

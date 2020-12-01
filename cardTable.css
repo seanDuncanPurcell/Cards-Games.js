@@ -14,12 +14,21 @@
 }
 
 .cover {  
-  display: none;
+  display: flex;
   position: absolute;
   z-index: 1;
   width: 100%;
   height: 100%;
   overflow: auto;
+  background-color: khaki;
+  justify-content: center;
+  align-items: center;
+}
+
+.cover button{
+  height: auto;
+  width: auto;
+  font-size: 5em;
 }
 
 .playerArea  {
@@ -51,8 +60,8 @@
 }
 
 .card img {  
-  height: 14vw;
-  width: 9vw;
+  height: 26.8vh;
+  width: 18vh;
 }
 
 #sideControl {
