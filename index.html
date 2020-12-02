@@ -8,12 +8,19 @@
 </head>
 <body>
   <div id="table_top">
+    <span id="newGame" class="cover">
+      <button onclick="GameDirector.startNewGame(this)">
+        Click to start a new game
+      </button>
+    </span>
+    <span id="resultScreen" class="cover" style="display: none;">
+      <h1 id="handResult">Sampl Result</h1>
+      <button onclick="GameDirector.nextHand(this)">
+        Deal Next Hand
+      </button>
+    </span>
+
     <span class="playerArea">
-      <span id="newGame" class="cover">
-        <button onclick="GameDirector.startNewGame(this)">
-          Click to start a new game
-        </button>
-      </span>
       <div></div>
       <div class="hand">
       </div>
@@ -21,16 +28,21 @@
         <em>Score: </em> <p class="scoureHolder">000</p>
       </div>
     </span>
+
+
     <span></span>
+
+
     <span class="playerArea">
+      <span class="bust">Bust</span>
       <div></div>
       <div class="hand">
       </div>
       <div id="sideControl">
         <em>Score: </em> <p class="scoureHolder">000</p> <br>
         <p>$</p><p id="playerWallet">000.00</p>
-        <button>Hit</button>
-        <button>Stay</button>
+        <button class="hitStay" onclick="GameDirector.hitPlayer()" disabled>Hit</input>
+        <button class="hitStay" onclick="GameDirector.stayPlayer()" disabled>Stay</input>
       </div>
     </span>
   </div>
