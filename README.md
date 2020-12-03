@@ -8,4 +8,3 @@ Goals:
 
 Game 1 BlackJack
   I'm starting with black because it is on of the simplest of the games and will allow get useable produce the fastest so I can move on to experimenting with optimisation as well as AI decision making.
- 

@@ -9,13 +9,13 @@
 <body>
   <div id="table_top">
     <span id="newGame" class="cover">
-      <button onclick="GameDirector.startNewGame(this)">
+      <button onclick="GameDirector.start()">
         Click to start a new game
       </button>
     </span>
     <span id="resultScreen" class="cover" style="display: none;">
       <h1 id="handResult">Sampl Result</h1>
-      <button onclick="GameDirector.nextHand(this)">
+      <button onclick="GameDirector.resetTable()">
         Deal Next Hand
       </button>
     </span>
@@ -25,21 +25,19 @@
       <div class="hand">
       </div>
       <div id="sideControl">
-        <em>Score: </em> <p class="scoureHolder">000</p>
+        <em>Score: </em> <p class="scoreHolder">000</p>
       </div>
     </span>
 
-
     <span></span>
 
-
     <span class="playerArea">
-      <span class="bust">Bust</span>
+      <span id="handBlocker" class="cover"></span>
       <div></div>
       <div class="hand">
       </div>
       <div id="sideControl">
-        <em>Score: </em> <p class="scoureHolder">000</p> <br>
+        <em>Score: </em> <p class="scoreHolder">000</p> <br>
         <p>$</p><p id="playerWallet">000.00</p>
         <button class="hitStay" onclick="GameDirector.hitPlayer()" disabled>Hit</input>
         <button class="hitStay" onclick="GameDirector.stayPlayer()" disabled>Stay</input>
@@ -48,7 +46,8 @@
   </div>
   <footer>
     <p>
-      Card SVG images sourced via <a href="https://commons.wikimedia.org/wiki/File:2H.svg">Adrian Kennard</a>, CC0, via Wikimedia Commons
+      Page behavior defined in JaveScript <a href="https://github.com/seanDuncanPurcell/Cards-Games.js">GitHub Cards-Games</a>. <br>
+      Card SVG images sourced via <a href="https://commons.wikimedia.org/wiki/File:2H.svg">Adrian Kennard</a>, CC0, via Wikimedia Commons.
     </p>
   </footer>
   <script src="main.js"></script>

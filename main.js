@@ -1,122 +1,51 @@
-
 class Player {
-  constructor(name){
+  constructor(){
     this.cards = [];
-    this.name = name;
     this.wallet = 500;
-    this.handValue;
-  }
-  dealCard(){
-    let cardDealt = Deck.deal();
-    this.cards.push(cardDealt);
-    console.log(cardDealt + " dealt to " + this.name);
-    (()=>{ //set this.handValue
-      let aceCounter = 0; //tracks howmany aces are in hand so the value can be reduces if nessicary 
-      let value = 0; //accumulates the values of all cards for return.
-      let cardFactor = 13; //represents the 13 distince cards in each suit
-      let logString = "";
-      for (let i = 0; i < this.cards.length; i++){ //for each card in hand
-        let cardValue;
-        let tempIndex = Deck.deckValues.indexOf(this.cards[i]) + 1; //find the index of the curent cards value in the sandard deck blue print with an offset from zero to one based counting.
-        let cardIndex = (tempIndex % cardFactor) + 1; //returns a consistens value for all 2s, 3, 4, Js, Qs, ect...
-        if (cardIndex > 1 && cardIndex < 11){
-          cardValue = cardIndex; //number cards are valued at their number
-          logString += (" + " + cardValue.toString());
-        }
-        else if (cardIndex >= 11 && cardIndex <= 13){
-          cardValue = 10; //face cards are valued at 10
-          logString += (" + " + cardValue.toString());
-        }
-        else if (cardIndex == 1){
-          aceCounter++;
-          cardValue = 11; //aces are valued at 11 but will be reduced to 1 if the player busts.
-          logString += (" + " + cardValue.toString());
-        } else {
-          throw new Error("Unable to evaluate card value");
-        }
-        value += cardValue;
-        if(i == 1 && value ==21){
-          this.handValue = "BlackJack";
-          return;
-        }
-      }
-
-      //devalue aces if the push the value over 21
-      if (value > 21 && aceCounter > 0){ 
-        for (let i = 0; i < aceCounter && value > 21; i++){
-          value - 10;
-          logString += " - 10";
-        }
-      }
-
-      console.log(`${logString} = ${value} AceCounter = ${aceCounter}`);    
-      if (value > 21){        
-        this.handValue = "Bust";
-        return;
-      }
-      this.handValue = value;
-    })();
   }
   clearHand () {this.cards = []}
 }
 
-const Deck = (function () {
-  const _standardDeck = ["2C", "3C", "4C", "5C", "6C", "7C", "8C", "9C", "10C", "JC", "QC", "KC", "AC" 
-    ,"2S", "3S", "4S", "5S", "6S", "7S", "8S", "9S", "10S", "JS", "QS", "KS", "AS" 
-    ,"2H", "3H", "4H", "5H", "6H", "7H", "8H", "9H", "10H", "JH", "QH", "KH", "AH" 
-    ,"2D", "3D", "4D", "5D", "6D", "7D", "8D", "9D", "10D", "JD", "QD", "KD", "AD" 
-  ]; //Suits; Clubs = C, Spades = S, Harts = H, Dimonds = D
-  let _cards = [0];
-
-  return {
-    shuffle() {
-      let counter = _standardDeck.length, temporaryValue, randomIndex;
-      _cards = [..._standardDeck];
+class Deck {
+  constructor(){
+    const _standardDeck = ["2C", "3C", "4C", "5C", "6C", "7C", "8C", "9C", "10C", "JC", "QC", "KC", "AC" 
+      ,"2S", "3S", "4S", "5S", "6S", "7S", "8S", "9S", "10S", "JS", "QS", "KS", "AS" 
+      ,"2H", "3H", "4H", "5H", "6H", "7H", "8H", "9H", "10H", "JH", "QH", "KH", "AH" 
+      ,"2D", "3D", "4D", "5D", "6D", "7D", "8D", "9D", "10D", "JD", "QD", "KD", "AD" 
+    ]; //Suits; Clubs = C, Spades = S, Harts = H, Dimonds = D
+    const _cards = [..._standardDeck];
+    const _discards = [];
+    const _shuffle = (array) => {
+      let counter = array.length, temporaryValue, randomIndex;
       // While there remain elements to shuffle...
-      while (0 !== counter) {
-    
+      while (0 !== counter) {  
         // Pick a remaining element...
         randomIndex = Math.floor(Math.random() * counter);
         counter -= 1;
     
         // And swap it with the current element.
-        temporaryValue = _cards[counter];
-        _cards[counter] = _cards[randomIndex];
-        _cards[randomIndex] = temporaryValue;
+        temporaryValue = array[counter];
+        array[counter] = array[randomIndex];
+        array[randomIndex] = temporaryValue;
       }
-    },
-    deal () {return _cards.pop();},
-    get report () {return _cards;},
-    get deckValues() {return _standardDeck;}
+    }
+    this.shuffleDeck = () => {
+      _shuffle(_cards);
+    }
+    this.shuffleDiscard = () => {
+      _shuffle(_discards);
+      _discards.forEach((card) => {_cards.unshift(card)});
+    }
+    this.deal = () => {return _cards.pop();}
+    this.reset = () => {_cards = [..._standardDeck];}
+    this.discard = (card) => {_discards.push(card)}
+    this.deckValues = () => {return _standardDeck;}
   }
-})();
+}
 
-const Table = (function () {
-  const _dealer = new Player("Dealer");
-  const _players = [];
-
-  return {
-    get player () {return _players;},
-    get dealer () {return _dealer;},
-
-    seatPlayer () {_players.push(new Player(`player${_players.length+1}`));},
-    dealAll (num) {
-      const playerCount = _players.length; //total players plus dealer
-      let cardsDealt = 0;
-      while(cardsDealt < num){
-        for(let i = 0; i < playerCount; i++){
-          _players[i].dealCard();
-        }
-        _dealer.dealCard();
-        cardsDealt++;
-      }
-    },
-  }
-})();
-
-const userIf_BJ = (function () { //User Interface director
-  const hands = document.getElementsByClassName("hand");
-  function newCard (suit) {
+const Interface = (function () {
+  const _hands = document.getElementsByClassName("hand");
+  const _newCard = (suit) => {
     let card = document.createElement("div");
     let img = document.createElement("img");
     card.className = "card";
@@ -125,135 +54,201 @@ const userIf_BJ = (function () { //User Interface director
     return card;
   }
   return {
-    setHandScore () {
-      const scoreHolders = document.getElementsByClassName("scoureHolder");
-      const players = [Table.dealer, ...Table.player];
-      for(let i = 0; i < players.length; i++){
-        scoreHolders[i].innerHTML = players[i].handValue;
-      }
-    },
-    setPlayerWallets () {
-      document.getElementById("playerWallet").innerHTML = Table.player[0].wallet;
-    },    
-    renderAllCards() {
-      const players = [Table.dealer, ...Table.player];
-      players.forEach((player, index) => {
-        for (suit of player.cards){hands[index].appendChild(newCard(suit));}
-      });
-    },
-    renderHitCard(index) {
-      const players = [Table.dealer, ...Table.player];
-      const player = players[index];
-      const suit = player.cards[player.cards.length - 1];
-      hands[index].appendChild(newCard(suit))
-    },
-    clearHands() {
-      for(hand of hands)
-        hand.innerHTML = "";
-    },
-    toggleCover(element) {
-      const style = element.parentElement.style
-      console.log(element.parentElement);
-      if (style.display === "none") {
-        style.display = "flex";
-      } else {
-        style.display = "none";
-      }
-    },
-    displayResult(result) {
-      let element = document.getElementById("handResult");
-      element.innerHTML = result;
-      this.toggleCover(element);
-      console.log(element);
-    },
-    toggleHitStay() {
+    toggleBtnDisabled () {
       btns = document.getElementsByClassName("hitStay");
       for (let i = 0; i < btns.length; i++){
         btns[i].toggleAttribute("disabled");
       }
-      // btns.forEach((btn) => {btn.value = ""});
+    },
+    toggleElmtFlex (elmt) {
+      const style = elmt.style
+      if (style.display === "none")
+        style.display = "flex";
+      else
+        style.display = "none";
+    },
+    renderCard (suit, index) {_hands[index].appendChild(_newCard(suit));},
+    setScore (value, index) {
+      const scoreHolders = document.getElementsByClassName("scoreHolder")
+      scoreHolders[index].innerHTML = value;
+    }, 
+    setWallet (num) {
+      const wallet = document.getElementById("playerWallet");
+      const number = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'USD' }).format(num);
+      wallet.innerHTML = number;
+    },
+    handBlocker (result) {
+      const elmt = document.getElementById("handBlocker");
+      elmt.innerHTML = result;
+      this.toggleElmtFlex(elmt);
+    },
+    dispResult (result) {
+      const elmn = document.getElementById("handResult");
+      elmn.innerHTML = result;
+      this.toggleElmtFlex(elmn.parentElement);
+    },
+    hideModules () {
+      const elmns = document.getElementsByClassName("cover");
+      for (let elmn of elmns) {
+        elmn.style.display = "none";
+      }
+    },
+    clearHands () {
+      for (let hand of _hands){
+        hand.innerHTML = "";
+      }
     },
   }
 })();
 
-const GameDirector = (function () {
-  let _dealerState = '';
-  let _playerState = '';
-  let _hndRes;
-  handRes = (handRes) => {
-    userIf_BJ.displayResult(handRes);
-    let betMod;
-    if (handRes == "BlackJack") {
-      betMod = 1.5;
-    } else if (handRes == "Win") {
-      betMod = 1;
-    } else if (handRes == "Lose") {
-      betMod = -1;
-    }
-    //mulitply players bet by betMod and add it to the wallet
+const GameDirector = (function(){
+  const _deck = new Deck();
+  const _players = [];
+  const _hands = [];
+  const _dealPlayer = (index) => {
+    let card = _deck.deal();
+    _hands[index].push(card);
+    Interface.renderCard(card, index);
+    console.log(`Player${index + 1} was dealt a ${card}.`)
   }
-  evalPlayerHand = () => {
-    _playerState = Table.player[0].handValue;
-  };
-  dealCard = (player) => {
-    console.log(player.name + " gets a card");
-    player.dealCard();
-    userIf_BJ.renderHitCard()
-  };
-  
-  return{
-    startNewGame (element) {
-      Deck.shuffle();
-      Table.seatPlayer();
-      userIf_BJ.setPlayerWallets();
-      userIf_BJ.toggleCover(element);
-      Table.dealAll(2);
-      userIf_BJ.renderAllCards();
-      //bet
-      userIf_BJ.setHandScore();
-      //turn over cards      
-      _playerState = Table.player[0].handValue;
-      evalPlayerHand();
-      userIf_BJ.toggleHitStay();
+  const _evalHand = (hand) => {
+    let aceCounter = 0; //tracks howmany aces are in hand so the value can be reduces if nessicary 
+    let value = 0; //accumulates the values of all cards for return.
+    let cardFactor = 13; //represents the 13 distince cards in each suit
+    let logString = "";
+    for (let i = 0; i < hand.length; i++){ //for each card in hand
+      let cardValue;
+      let tempIndex = _deck.deckValues().indexOf(hand[i]) + 1; //find the index of the curent cards value in the sandard deck blue print with an offset from zero to one based counting.
+      let cardIndex = (tempIndex % cardFactor) + 1; //returns a consistens value for all 2s, 3, 4, Js, Qs, ect...
+      if (cardIndex > 1 && cardIndex < 11){
+        cardValue = cardIndex; //number cards are valued at their number
+        logString += (" + " + cardValue.toString());
+      }
+      else if (cardIndex >= 11 && cardIndex <= 13){
+        cardValue = 10; //face cards are valued at 10
+        logString += (" + " + cardValue.toString());
+      }
+      else if (cardIndex == 1){
+        aceCounter++;
+        cardValue = 11; //aces are valued at 11 but will be reduced to 1 if the player busts.
+        logString += (" + " + cardValue.toString());
+      } else {
+        throw new Error("Unable to evaluate card value");
+      }
+      value += cardValue;
+      if(i == 1 && value == 21){
+        return "BlackJack";
+      }
+    }
+
+    //devalue aces if the push the value over 21
+    if (value > 21 && aceCounter > 0){ 
+      for (let i = 0; i < aceCounter && value > 21; i++){
+        value - 10;
+        logString += " - 10";
+      }
+    }
+
+    console.log(`${logString} = ${value} AceCounter = ${aceCounter}`);
+    //check for "BUST!"
+    if (value > 21){        
+      return "Bust";      
+    }
+
+    return value;
+  }
+  const _seatPlayers = (n) => {
+    let i = 0;
+    while (i < n) {
+      _players.push(new Player());
+      _hands[i] = _players[i].cards;
+      i++
+    }
+  }
+  const _dealersTurn = () => {
+    let dealerHand = _evalHand(_hands[0]);
+    window.setTimeout(() => {
+      if (dealerHand <= 16){
+        _dealPlayer(0)
+        _dealersTurn();
+      }
+      let playerHand = _evalHand(_hands[1]);
+
+      //if dealers hand is not under 17 then compare dealer and player
+      if (playerHand == dealerHand){
+        _endRound("Push");
+      } else if (playerHand == "BlackJack") {          
+        _endRound("BlackJack");
+      } else if (playerHand == "Bust" || dealerHand == "BlackJack" || playerHand < dealerHand){
+        _endRound("Lose");
+      } else if (playerHand > dealerHand){
+        _endRound("Win");
+      } else {
+        throw new Error("Game Director fail to compare dealer and players hands at _dealersTurn()");
+      }
+    }, 5*100 );
+  }
+  const _endRound = (result) => {
+    if (result == "Win") {
+      //pay  twice players bet
+    }else if (result == "Push") {
+      //return players bet to their wallet
+    }else if (result == "BlackJack") {
+      //pay 2.5 times players bet
+    }
+    Interface.setWallet(_players[1].wallet);
+    Interface.dispResult(result);
+  }
+  return {
+    start () {
+      _seatPlayers(2);
+      _deck.shuffleDeck();
+      Interface.setWallet(_players[1].wallet);
+      this.resetTable();
     },
     hitPlayer () {
-      console.log("player hits");
-      let player = Table.player[0];
-      player.dealCard();
-      userIf_BJ.renderHitCard(1, player.cards[player.cards.length - 1]);
-      userIf_BJ.setHandScore();
-      evalPlayerHand();
-    },
-    stayPlayer () {      
-      userIf_BJ.toggleHitStay();
-      this.dealersTurn();
-    },
-    nextHand (ele) {
-      //clear table and hands, but save players and wallets
-      userIf_BJ.toggleCover(ele);
-      userIf_BJ.clearHands();
-    },
-    dealersTurn () {
-      //evaluate hand value
-      const dealer = Table.dealer;
-      const val = dealer.handValue;
-      window.setTimeout(()=>{
-        if (val <= 16){          
-          Table.dealer.dealCard();
-          userIf_BJ.renderHitCard(0);
-          userIf_BJ.setHandScore();
-          this.dealersTurn();
-        }
-      }, 5*100);
-
-      //if <= 16 && not bust hit and return to last step.
-      if (val > 21) {
-        //bust dealer
-        console.log("Dealer Busts");
+      _dealPlayer(1);
+      let playerHand = _evalHand(_hands[1]);
+      Interface.setScore(playerHand, 1);
+      if (playerHand < 21){
+        return;
       }
-      userIf_BJ.toggleHitStay();
-      //evaluate all hands against dealers
+      if (playerHand >= 21){
+        Interface.handBlocker(playerHand);
+      }
     },
+    stayPlayer () {
+      Interface.toggleBtnDisabled();
+      _dealersTurn();
+    },
+    resetTable () {
+      if (_hands[0].length > 0){      //if first player has cards
+        _hands.forEach((cards) => {   //move all players cards to deck discard
+          let i = 0;
+          while (i < cards.length){
+            _deck.discard(cards[i]);
+            i++;
+          }
+        });
+        Interface.clearHands();      
+      }
+      Interface.hideModules();      //hide all module
+      for (let i = 0; i < 2; i++){  //deal all players two cards
+        _hands.forEach((hand, i) => { 
+          _dealPlayer(i);
+        });
+      }
+      
+      Interface.setScore(_evalHand(_hands[0]), 0);  //eval player and dealer so scores can be set
+      let playerHand = _evalHand(_hands[1]);         //keep player score for BlackJack eval
+      Interface.setScore(playerHand, 1);
+  
+      if (playerHand == "BlackJack"){           //if the player has black jack
+        Interface.handBlocker(playerHand);        //set set his hand to BlackJack
+        _dealersTurn();                           //let the dealer go
+      } else {                                  //otherwise
+        Interface.toggleBtnDisabled();            //allow use of HitStayBtns
+      }
+    }
   }
 })();
-
