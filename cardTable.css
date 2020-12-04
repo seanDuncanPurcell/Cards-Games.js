@@ -32,22 +32,10 @@
   font-size: 4em;
   padding: 15px;
 }
-.bust {
-  display: none; /* Display Flex when shown  */
-  color: yellow;
-  font-size: 4em;
-  position: absolute;
-  z-index: 1;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  justify-content: center;
-  align-items: center;
-  /* background-color: rgba(0, 0, 0, 0.589); */
-}
 
-#resultScreen {
-  display: none;
+#resultScreen, #handBlocker {
+  display: none;  
+  background-color: rgba(0, 0, 0, 0.842);
 }
 
 .playerArea  {

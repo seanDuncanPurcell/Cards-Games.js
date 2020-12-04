@@ -55,19 +55,17 @@ const Interface = (function () {
   }
   return {
     toggleBtnDisabled () {
+      console.log("toggleBtnDisabled called");
       btns = document.getElementsByClassName("hitStay");
       for (let i = 0; i < btns.length; i++){
-        btns[i].toggleAttribute("disabled");
+        let x = btns[i].toggleAttribute("disabled");        
+        console.log("butten " + i + " disabled " + x);
       }
     },
-    toggleElmtFlex (elmt) {
-      const style = elmt.style
-      if (style.display === "none")
-        style.display = "flex";
-      else
-        style.display = "none";
+    renderCard (suit, index) {
+      console.log("card rendered at player" + index);
+      _hands[index].appendChild(_newCard(suit));
     },
-    renderCard (suit, index) {_hands[index].appendChild(_newCard(suit));},
     setScore (value, index) {
       const scoreHolders = document.getElementsByClassName("scoreHolder")
       scoreHolders[index].innerHTML = value;
@@ -77,23 +75,28 @@ const Interface = (function () {
       const number = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'USD' }).format(num);
       wallet.innerHTML = number;
     },
-    handBlocker (result) {
+    setHandBlocker (result) {
+      console.log("handBlocker called");
       const elmt = document.getElementById("handBlocker");
       elmt.innerHTML = result;
-      this.toggleElmtFlex(elmt);
+      this.toggleBtnDisabled();
+      elmt.style.display = 'flex';
     },
-    dispResult (result) {
+    showRsltScreen (result) {
       const elmn = document.getElementById("handResult");
       elmn.innerHTML = result;
-      this.toggleElmtFlex(elmn.parentElement);
+      elmn.parentElement.style.display = 'flex';
+      console.log('Result: ' + result);
     },
     hideModules () {
+      console.log("hide modules called");
       const elmns = document.getElementsByClassName("cover");
       for (let elmn of elmns) {
         elmn.style.display = "none";
       }
     },
     clearHands () {
+      console.log("clearHands Called");
       for (let hand of _hands){
         hand.innerHTML = "";
       }
@@ -105,11 +108,15 @@ const GameDirector = (function(){
   const _deck = new Deck();
   const _players = [];
   const _hands = [];
+  const _sleep = (ms) => {
+    var currentTime = new Date().getTime(); 
+    while (currentTime + ms >= new Date().getTime()) { console.log("...") }
+  }
   const _dealPlayer = (index) => {
     let card = _deck.deal();
-    _hands[index].push(card);
     Interface.renderCard(card, index);
-    console.log(`Player${index + 1} was dealt a ${card}.`)
+    _hands[index].push(card);
+    console.log(`Player ${index + 1} was dealt a ${card}.`)
   }
   const _evalHand = (hand) => {
     let aceCounter = 0; //tracks howmany aces are in hand so the value can be reduces if nessicary 
@@ -144,7 +151,7 @@ const GameDirector = (function(){
     //devalue aces if the push the value over 21
     if (value > 21 && aceCounter > 0){ 
       for (let i = 0; i < aceCounter && value > 21; i++){
-        value - 10;
+        value -= 10;
         logString += " - 10";
       }
     }
@@ -165,30 +172,8 @@ const GameDirector = (function(){
       i++
     }
   }
-  const _dealersTurn = () => {
-    let dealerHand = _evalHand(_hands[0]);
-    window.setTimeout(() => {
-      if (dealerHand <= 16){
-        _dealPlayer(0)
-        _dealersTurn();
-      }
-      let playerHand = _evalHand(_hands[1]);
-
-      //if dealers hand is not under 17 then compare dealer and player
-      if (playerHand == dealerHand){
-        _endRound("Push");
-      } else if (playerHand == "BlackJack") {          
-        _endRound("BlackJack");
-      } else if (playerHand == "Bust" || dealerHand == "BlackJack" || playerHand < dealerHand){
-        _endRound("Lose");
-      } else if (playerHand > dealerHand){
-        _endRound("Win");
-      } else {
-        throw new Error("Game Director fail to compare dealer and players hands at _dealersTurn()");
-      }
-    }, 5*100 );
-  }
   const _endRound = (result) => {
+    console.log("endRound called :" + result);
     if (result == "Win") {
       //pay  twice players bet
     }else if (result == "Push") {
@@ -197,10 +182,11 @@ const GameDirector = (function(){
       //pay 2.5 times players bet
     }
     Interface.setWallet(_players[1].wallet);
-    Interface.dispResult(result);
+    Interface.showRsltScreen(result);
   }
   return {
     start () {
+      console.log("start called");
       _seatPlayers(2);
       _deck.shuffleDeck();
       Interface.setWallet(_players[1].wallet);
@@ -210,45 +196,89 @@ const GameDirector = (function(){
       _dealPlayer(1);
       let playerHand = _evalHand(_hands[1]);
       Interface.setScore(playerHand, 1);
-      if (playerHand < 21){
+      if (playerHand < 21)
         return;
-      }
-      if (playerHand >= 21){
-        Interface.handBlocker(playerHand);
+      if (playerHand == "Bust" || playerHand === 21){
+        Interface.setHandBlocker(playerHand);
+        this.dealersTurn();
       }
     },
     stayPlayer () {
       Interface.toggleBtnDisabled();
-      _dealersTurn();
+      this.dealersTurn();
+    },
+    dealersTurn () {
+      console.log("dealers turn called");    
+      const dealerHand = _evalHand(_hands[0]);
+      Interface.setScore(dealerHand, 0);
+      if (dealerHand <= 16 && typeof dealerHand == "number"){
+        _dealPlayer(0);
+        setTimeout(()=>{
+          this.dealersTurn();
+        }, 1500);      
+      } else {
+        this.endGameEval();
+      }
     },
     resetTable () {
-      if (_hands[0].length > 0){      //if first player has cards
-        _hands.forEach((cards) => {   //move all players cards to deck discard
-          let i = 0;
-          while (i < cards.length){
-            _deck.discard(cards[i]);
-            i++;
-          }
-        });
-        Interface.clearHands();      
-      }
-      Interface.hideModules();      //hide all module
-      for (let i = 0; i < 2; i++){  //deal all players two cards
-        _hands.forEach((hand, i) => { 
-          _dealPlayer(i);
-        });
+      console.log("resetTable called");
+      const strtCards = 2;
+      const dealersIndex = 0;
+      const playerIndex = 1;
+      _hands.forEach((cards) => {   //move all players cards to deck discard
+        while (0 < cards.length){
+          _deck.discard(cards.pop());
+        }
+      });
+      Interface.clearHands();
+      Interface.hideModules();
+      for (let i = 0; i < strtCards; i++){  //deal n cards...
+        for (let j = 0; j < _hands.length; j++){ //...to each hand in _hand
+          _dealPlayer(j)          
+        }
       }
       
-      Interface.setScore(_evalHand(_hands[0]), 0);  //eval player and dealer so scores can be set
-      let playerHand = _evalHand(_hands[1]);         //keep player score for BlackJack eval
-      Interface.setScore(playerHand, 1);
+      Interface.setScore(_evalHand(_hands[dealersIndex]), dealersIndex);  //eval player and dealer so scores can be set
+      let playerHand = _evalHand(_hands[playerIndex]);         //keep player score for BlackJack eval
+      Interface.setScore(playerHand, playerIndex);
   
       if (playerHand == "BlackJack"){           //if the player has black jack
-        Interface.handBlocker(playerHand);        //set set his hand to BlackJack
-        _dealersTurn();                           //let the dealer go
+        Interface.setHandBlocker(playerHand);        //set set his hand to BlackJack
+        this.dealersTurn();                           //let the dealer go
       } else {                                  //otherwise
         Interface.toggleBtnDisabled();            //allow use of HitStayBtns
       }
+    },
+    endGameEval () {
+      console.log('end of game eval called');
+      const dealer = _evalHand(_hands[0]);
+      const player = _evalHand(_hands[1]);
+      let result = "none";
+
+      if (typeof player == "number" && typeof dealer == "number"){
+        if (player > dealer) 
+          result = "Win";
+        else if (player < dealer) 
+          result = "Lose";
+      } else {
+        if (player == dealer) 
+          result = "Push";
+        else if (player == "BlackJack") 
+          result = "BlackJack";
+        else if (player == "Bust" || dealer == "BlackJack") 
+          result = "Lose";
+        else if (dealer == "Bust") 
+          result = "win";
+        else 
+          throw new Error('Game Director failed to compare dealer & player hands.')
+      }
+
+      _endRound(result);
+    },
+    handCheck () {
+      console.log(_hands[0], _hands[1]);
+      
+      console.log(_players[0].cards, _players[1].cards);
     }
   }
 })();
