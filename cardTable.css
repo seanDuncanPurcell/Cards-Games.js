@@ -2,6 +2,11 @@
   margin: 0;
   padding: 0;  
 }
+
+#newGame, #table_top {  
+  background-color: khaki;
+}
+
 #table_top {
   position: relative;
   width: auto;
@@ -10,17 +15,15 @@
   grid-template-columns: 1fr;
   grid-template-rows: 2fr 1fr 2fr;
   border: 1px solid black;
-  background-color: khaki;
 }
 
-.cover {  
+.cover{  
   display: flex;
   position: absolute;
-  z-index: 2;
+  z-index: 3;
   width: 100%;
   height: 100%;
   overflow: auto;
-  background-color: khaki;
   justify-content: center;
   align-items: center;
   flex-direction: column;
@@ -33,9 +36,25 @@
   padding: 15px;
 }
 
-#resultScreen, #handBlocker {
-  display: none;  
-  background-color: rgba(0, 0, 0, 0.842);
+#resultScreen{
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+#blockerHolder {
+  z-index: 2;
+  border: 3px solid red;
+}
+
+#handBlocker {
+  width: 50%;
+  height: auto;
+  border: 5px solid black;
+  border-radius: 5px;
+  background-color: khaki;
+  color: black;
+  font-size: 4em;
+  text-align: center;
+  vertical-align: middle;
 }
 
 .playerArea  {

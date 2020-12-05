@@ -80,7 +80,7 @@ const Interface = (function () {
       const elmt = document.getElementById("handBlocker");
       elmt.innerHTML = result;
       this.toggleBtnDisabled();
-      elmt.style.display = 'flex';
+      elmt.parentElement.style.display = 'flex';
     },
     showRsltScreen (result) {
       const elmn = document.getElementById("handResult");
@@ -193,15 +193,19 @@ const GameDirector = (function(){
       this.resetTable();
     },
     hitPlayer () {
-      _dealPlayer(1);
-      let playerHand = _evalHand(_hands[1]);
-      Interface.setScore(playerHand, 1);
-      if (playerHand < 21)
+      setTimeout(()=>{
+        _dealPlayer(1);
+        let playerHand = _evalHand(_hands[1]);
+        Interface.setScore(playerHand, 1);
+        if (playerHand < 21)
         return;
-      if (playerHand == "Bust" || playerHand === 21){
-        Interface.setHandBlocker(playerHand);
-        this.dealersTurn();
-      }
+        if (playerHand == "Bust" || playerHand === 21){
+          Interface.setHandBlocker(playerHand);
+          setTimeout(()=>{
+            this.dealersTurn();
+          }, 2000)
+        }
+      }, 1000);
     },
     stayPlayer () {
       Interface.toggleBtnDisabled();
@@ -241,12 +245,11 @@ const GameDirector = (function(){
       Interface.setScore(_evalHand(_hands[dealersIndex]), dealersIndex);  //eval player and dealer so scores can be set
       let playerHand = _evalHand(_hands[playerIndex]);         //keep player score for BlackJack eval
       Interface.setScore(playerHand, playerIndex);
+      Interface.toggleBtnDisabled();
   
       if (playerHand == "BlackJack"){           //if the player has black jack
         Interface.setHandBlocker(playerHand);        //set set his hand to BlackJack
         this.dealersTurn();                           //let the dealer go
-      } else {                                  //otherwise
-        Interface.toggleBtnDisabled();            //allow use of HitStayBtns
       }
     },
     endGameEval () {
