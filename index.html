@@ -15,13 +15,31 @@
     </span>
     <span id="resultScreen" class="cover" style="display: none;">
       <h1 id="handResult" style="color: whitesmoke;">Sampl Result</h1>
-      <button onclick="GameDirector.resetTable()">
+      <button onclick="Interface.dispBetScreen();">
         Deal Next Hand
       </button>
     </span>
-
+    <span id="betScreen" class="cover" style="display: none;">
+      <h1 style="color: whitesmoke;">
+        Place your bet.
+      </h1>
+      <Span>
+        <button onclick="GameDirector.placeBet(5);">
+          $5
+        </button>
+        <button onclick="GameDirector.placeBet(20);">
+          $20
+        </button>
+        <button onclick="GameDirector.placeBet(50);">
+          $50
+        </button>
+      </Span>
+    </span>
+<!-- Dealer -->
     <span class="playerArea">
-      <span id="dealerAction" class="cover"></span>
+      <span class="cover">
+        <span id="dealerBlocker" class="blocker">Sample</span>
+      </span>
       <div></div>
       <div class="hand">
       </div>
@@ -31,17 +49,17 @@
     </span>
 
     <span></span>
-
+<!-- Player -->
     <span class="playerArea">
-      <span id="blockerHolder" class="cover">
-        <span id="handBlocker" >Sample</span>
+      <span class="cover">
+        <span id="handBlocker" class="blocker">Sample</span>
       </span>
       <div></div>
       <div class="hand">
       </div>
       <div id="sideControl">
         <em>Score: </em> <p class="scoreHolder">000</p> <br>
-        <p>$</p><p id="playerWallet">000.00</p>
+        <p id="playerWallet">000.00</p>
         <button class="hitStay" onclick="GameDirector.hitPlayer()" disabled>Hit</input>
         <button class="hitStay" onclick="GameDirector.stayPlayer()" disabled>Stay</input>
       </div>

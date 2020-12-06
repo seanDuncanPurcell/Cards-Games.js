@@ -17,6 +17,15 @@
   border: 1px solid black;
 }
 
+#newGame, #resultScreen {
+  z-index: 4;
+}
+
+#handBlocker, #dealerBlock {
+  z-index: 2;
+  border: 3px solid red;
+}
+
 .cover{  
   display: flex;
   position: absolute;
@@ -40,12 +49,7 @@
   background-color: rgba(0, 0, 0, 0.5);
 }
 
-#blockerHolder {
-  z-index: 2;
-  border: 3px solid red;
-}
-
-#handBlocker {
+.blocker{
   width: 50%;
   height: auto;
   border: 5px solid black;
@@ -102,4 +106,16 @@
 }
 #sideControl > em, p {
   display: inline;
+}
+#betScreen span {
+  width: auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr;
+}
+#betScreen {
+  background: khaki;
+}
+button {
+  margin: 10px;
 }

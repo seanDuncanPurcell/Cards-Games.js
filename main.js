@@ -1,3 +1,6 @@
+// Replace restult strings with variables
+// Add hand blocker to dealers hand. 
+
 class Player {
   constructor(){
     this.cards = [];
@@ -69,7 +72,11 @@ const Interface = (function () {
     setScore (value, index) {
       const scoreHolders = document.getElementsByClassName("scoreHolder")
       scoreHolders[index].innerHTML = value;
-    }, 
+    },
+    dispBetScreen () {
+      this.hideModules();
+      document.getElementById("betScreen").style.display = "flex";      
+    },
     setWallet (num) {
       const wallet = document.getElementById("playerWallet");
       const number = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'USD' }).format(num);
@@ -82,6 +89,12 @@ const Interface = (function () {
       this.toggleBtnDisabled();
       elmt.parentElement.style.display = 'flex';
     },
+    setDealerBlocker (text) {
+      const elmt = document.getElementById("dealerBlocker");
+      elmt.innerHTML = text;
+      elmt.parentElement.style.display = 'flex';
+      console.log("dealer Blocker called, Elmn set to: " + elmt.parentElement.style.display);
+    },
     showRsltScreen (result) {
       const elmn = document.getElementById("handResult");
       elmn.innerHTML = result;
@@ -90,8 +103,8 @@ const Interface = (function () {
     },
     hideModules () {
       console.log("hide modules called");
-      const elmns = document.getElementsByClassName("cover");
-      for (let elmn of elmns) {
+      const covers = document.getElementsByClassName("cover");
+      for (let elmn of covers) {
         elmn.style.display = "none";
       }
     },
@@ -105,6 +118,7 @@ const Interface = (function () {
 })();
 
 const GameDirector = (function(){
+  let _betHolder = 0;
   const _deck = new Deck();
   const _players = [];
   const _hands = [];
@@ -175,12 +189,13 @@ const GameDirector = (function(){
   const _endRound = (result) => {
     console.log("endRound called :" + result);
     if (result == "Win") {
-      //pay  twice players bet
+      _players[1].wallet += (_betHolder * 2);
     }else if (result == "Push") {
-      //return players bet to their wallet
+      _players[1].wallet += _betHolder;
     }else if (result == "BlackJack") {
-      //pay 2.5 times players bet
-    }
+      _players[1].wallet += (_betHolder * 2.5);
+    }else { console.log("bet failed" + result)}
+    _betHolder = 0;
     Interface.setWallet(_players[1].wallet);
     Interface.showRsltScreen(result);
   }
@@ -190,7 +205,8 @@ const GameDirector = (function(){
       _seatPlayers(2);
       _deck.shuffleDeck();
       Interface.setWallet(_players[1].wallet);
-      this.resetTable();
+      Interface.hideModules();
+      Interface.dispBetScreen();
     },
     hitPlayer () {
       setTimeout(()=>{
@@ -208,7 +224,7 @@ const GameDirector = (function(){
       }, 1000);
     },
     stayPlayer () {
-      Interface.toggleBtnDisabled();
+      Interface.setHandBlocker(`Stay at ${_evalHand(_hands[1])}`);
       this.dealersTurn();
     },
     dealersTurn () {
@@ -221,6 +237,11 @@ const GameDirector = (function(){
           this.dealersTurn();
         }, 1500);      
       } else {
+        if (dealerHand <= 21) {
+          Interface.setDealerBlocker(`Stay at ${dealerHand}`);
+        } else {
+          Interface.setDealerBlocker(dealerHand);
+        }
         this.endGameEval();
       }
     },
@@ -234,6 +255,7 @@ const GameDirector = (function(){
           _deck.discard(cards.pop());
         }
       });
+      Interface.setWallet(_players[1].wallet);
       Interface.clearHands();
       Interface.hideModules();
       for (let i = 0; i < strtCards; i++){  //deal n cards...
@@ -278,10 +300,13 @@ const GameDirector = (function(){
 
       _endRound(result);
     },
+    placeBet(bet) {
+      _players[1].wallet -= bet;
+      _betHolder += bet;
+      this.resetTable()
+    },
     handCheck () {
-      console.log(_hands[0], _hands[1]);
-      
-      console.log(_players[0].cards, _players[1].cards);
+      console.log(`Bet: ${_betHolder} Wallet: ${_players[1].wallet}`);
     }
   }
 })();
