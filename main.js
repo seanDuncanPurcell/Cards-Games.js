@@ -1,5 +1,5 @@
 // Replace restult strings with variables
-// Add hand blocker to dealers hand. 
+
 
 class Player {
   constructor(){
@@ -35,14 +35,19 @@ class Deck {
     this.shuffleDeck = () => {
       _shuffle(_cards);
     }
-    this.shuffleDiscard = () => {
+    this.shuffleDiscards = () => {
       _shuffle(_discards);
-      _discards.forEach((card) => {_cards.unshift(card)});
+      _discards.forEach((card) => {
+        _cards.unshift(card);
+      });
+      _discards.length = 0;
     }
     this.deal = () => {return _cards.pop();}
     this.reset = () => {_cards = [..._standardDeck];}
-    this.discard = (card) => {_discards.push(card)}
+    this.discard = (card) => {_discards.push(card);}
     this.deckValues = () => {return _standardDeck;}
+    this.reportDiscard = () => {return _discards;}
+    this.reportCards = () => {return _cards;}
   }
 }
 
@@ -126,7 +131,9 @@ const GameDirector = (function(){
     var currentTime = new Date().getTime(); 
     while (currentTime + ms >= new Date().getTime()) { console.log("...") }
   }
-  const _dealPlayer = (index) => {
+  const _dealCard = (index) => {
+    if (_deck.reportCards().length <= 1) _deck.shuffleDiscards();
+
     let card = _deck.deal();
     Interface.renderCard(card, index);
     _hands[index].push(card);
@@ -209,30 +216,35 @@ const GameDirector = (function(){
       Interface.dispBetScreen();
     },
     hitPlayer () {
-      setTimeout(()=>{
-        _dealPlayer(1);
-        let playerHand = _evalHand(_hands[1]);
-        Interface.setScore(playerHand, 1);
-        if (playerHand < 21)
-        return;
-        if (playerHand == "Bust" || playerHand === 21){
-          Interface.setHandBlocker(playerHand);
-          setTimeout(()=>{
-            this.dealersTurn();
-          }, 2000)
-        }
-      }, 1000);
+      _dealCard(1);
+      let playerHand = _evalHand(_hands[1]);
+      Interface.setScore(playerHand, 1);
+      if (playerHand < 21)
+        return true;
+      if (playerHand == "Bust" || playerHand === 21){
+        Interface.setHandBlocker(playerHand);
+        setTimeout(()=>{
+          this.dealersTurn();
+        }, 2000);
+      }
     },
     stayPlayer () {
       Interface.setHandBlocker(`Stay at ${_evalHand(_hands[1])}`);
       this.dealersTurn();
+    },
+    doublePlayer () {
+      _players[1].wallet -= _betHolder;
+      Interface.setWallet(_players[1].wallet);
+      _betHolder *= 2;
+      const dealersTurn = this.hitPlayer();
+      if (dealersTurn == true) this.stayPlayer();
     },
     dealersTurn () {
       console.log("dealers turn called");    
       const dealerHand = _evalHand(_hands[0]);
       Interface.setScore(dealerHand, 0);
       if (dealerHand <= 16 && typeof dealerHand == "number"){
-        _dealPlayer(0);
+        _dealCard(0);
         setTimeout(()=>{
           this.dealersTurn();
         }, 1500);      
@@ -260,7 +272,7 @@ const GameDirector = (function(){
       Interface.hideModules();
       for (let i = 0; i < strtCards; i++){  //deal n cards...
         for (let j = 0; j < _hands.length; j++){ //...to each hand in _hand
-          _dealPlayer(j)          
+          _dealCard(j)          
         }
       }
       
@@ -306,7 +318,7 @@ const GameDirector = (function(){
       this.resetTable()
     },
     handCheck () {
-      console.log(`Bet: ${_betHolder} Wallet: ${_players[1].wallet}`);
+      console.log(`Discard Pile: ${_deck.reportDiscard()}`);
     }
   }
 })();
