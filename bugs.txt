@@ -1,0 +1,1 @@
+[] After players and dealer ending round with "20" restule returned "none"

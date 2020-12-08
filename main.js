@@ -1,12 +1,62 @@
-// Replace restult strings with variables
+// Convention: The location of a players individual hand is indicated by...
+// ...a 2d array due to the need have a second player hand for when the player splits.
 
 
 class Player {
-  constructor(){
-    this.cards = [];
+  constructor(evalfunc){
+    let _state = [4, 4];
+    this.states = ["BlackJack", "Push", "Bust", "none"];
+    this.handValue = [0, 0];
+    this.hands = [[],[]];
     this.wallet = 500;
+    this.bet = [0, 0];
+    this.setState = (x) => {
+      const index = _states.indexOf(x);
+      if (index == -1)
+        throw new Error("Invalid setState Attempted");
+      else
+        _state = index;
+    }
+    this.getState = () => {
+      let i = 0;
+      let array = [];
+      while (i < _state.length){
+        array.push(return_states[_state[i]]);
+      }
+      return array;
+    }
+    this.evalMe = () => {
+      let i = 0;
+      while (i < this.hand.length){
+        if (this.hand[i] != undefined){
+          let retVal = evalfunc(this.hand[i]);
+          if (retVal == this.states.indexOf("BlackJack")) _state[i] = retVal;
+          else this.handValue[i];
+        }
+        i++;
+      }
+    }
+    this.bet = (num) => {
+      this.bet[0] += num;
+      this.wallet -= num;
+    }
+    this.double = (i) => {
+      this.wallet - this.bet[i];
+      this.bet[i] *=  2;
+    }
+    this.split = () => {      
+      this.wallet - this.bet[0];
+      this.bet[1] = his.bet[0];
+    }
+    this.payOut = (blackJack = false) => {
+      let winFactor = 2;
+      if (blackJack) winFactor = 2.5;
+      let winnings = this.bet.reduce((a, b)=> {a + b});
+      this.wallet += (winnings * winFactor);
+      return winnings;
+    }
   }
-  clearHand () {this.cards = []}
+  handClear () {this.hand = [[], []];}
 }
 
 class Deck {
@@ -48,6 +98,67 @@ class Deck {
     this.deckValues = () => {return _standardDeck;}
     this.reportDiscard = () => {return _discards;}
     this.reportCards = () => {return _cards;}
+  }
+}
+
+class Table {
+  constructor(){
+    this.deck = new Deck;
+    this.players = (()=>{
+      return [
+        new Player(this.evalHand),
+        new Player(this.evalHand)
+      ]
+    })();
+    this.states = this.players[0].states;
+  }
+  evalHand(hand){
+    let aceCounter = 0; //tracks howmany aces are in hand so the value can be reduces if nessicary 
+    let value = 0; //accumulates the values of all cards for return.
+    let cardFactor = 13; //represents the 13 distince cards in each suit
+    let logString = "";
+    for (let i = 0; i < hand.length; i++){ //for each card in hand
+      let cardValue;
+      let tempIndex = this.deck.deckValues().indexOf(hand[i]) + 1; //find the index of the curent cards value in the sandard deck blue print with an offset from zero to one based counting.
+      let cardIndex = (tempIndex % cardFactor) + 1; //returns a consistens value for all 2s, 3, 4, Js, Qs, ect...
+      if (cardIndex > 1 && cardIndex < 11){
+        cardValue = cardIndex; //number cards are valued at their number
+        logString += (" + " + cardValue.toString());
+      }
+      else if (cardIndex >= 11 && cardIndex <= 13){
+        cardValue = 10; //face cards are valued at 10
+        logString += (" + " + cardValue.toString());
+      }
+      else if (cardIndex == 1){
+        aceCounter++;
+        cardValue = 11; //aces are valued at 11 but will be reduced to 1 if the player busts.
+        logString += (" + " + cardValue.toString());
+      } else {
+        throw new Error("Unable to evaluate card value");
+      }
+      if(i == 1 && value == 21) return this.states.indexOf("BlackJack");
+
+      value += cardValue;
+    }
+    //devalue aces if the push the value over 21
+    if (value > 21 && aceCounter > 0){ 
+      for (let i = 0; i < aceCounter && value > 21; i++){
+        value -= 10;
+        logString += " - 10";
+      }
+    }
+
+    console.log(`${logString} = ${value} AceCounter = ${aceCounter}`);
+    return value;
+  }
+  dealCard(input){
+    let player = input[0];
+    let hand = input[1];
+    const card = this.deck.deal();
+
+    this.players[player].hands[hand].push(card);
+    this.players[player].evalMe(this.evalHand);
+    return card;
   }
 }
 
@@ -123,75 +234,22 @@ const Interface = (function () {
 })();
 
 const GameDirector = (function(){
-  let _betHolder = 0;
-  const _deck = new Deck();
-  const _players = [];
-  const _hands = [];
-  const _sleep = (ms) => {
-    var currentTime = new Date().getTime(); 
-    while (currentTime + ms >= new Date().getTime()) { console.log("...") }
-  }
-  const _dealCard = (index) => {
+  const _table = new Table();
+  const _deck = _table.deck;
+  const _players = _table.players;
+  const _hands = [_players[0].hands, _players[1].hands];
+  const _dealCard = (input) => {
     if (_deck.reportCards().length <= 1) _deck.shuffleDiscards();
+    let player = input[0];
+    let hand = input[1];
+    
+    let card = _table.dealCard(input);
+    let handVal = _players[player].handValue[hand];
 
-    let card = _deck.deal();
-    Interface.renderCard(card, index);
-    _hands[index].push(card);
-    console.log(`Player ${index + 1} was dealt a ${card}.`)
-  }
-  const _evalHand = (hand) => {
-    let aceCounter = 0; //tracks howmany aces are in hand so the value can be reduces if nessicary 
-    let value = 0; //accumulates the values of all cards for return.
-    let cardFactor = 13; //represents the 13 distince cards in each suit
-    let logString = "";
-    for (let i = 0; i < hand.length; i++){ //for each card in hand
-      let cardValue;
-      let tempIndex = _deck.deckValues().indexOf(hand[i]) + 1; //find the index of the curent cards value in the sandard deck blue print with an offset from zero to one based counting.
-      let cardIndex = (tempIndex % cardFactor) + 1; //returns a consistens value for all 2s, 3, 4, Js, Qs, ect...
-      if (cardIndex > 1 && cardIndex < 11){
-        cardValue = cardIndex; //number cards are valued at their number
-        logString += (" + " + cardValue.toString());
-      }
-      else if (cardIndex >= 11 && cardIndex <= 13){
-        cardValue = 10; //face cards are valued at 10
-        logString += (" + " + cardValue.toString());
-      }
-      else if (cardIndex == 1){
-        aceCounter++;
-        cardValue = 11; //aces are valued at 11 but will be reduced to 1 if the player busts.
-        logString += (" + " + cardValue.toString());
-      } else {
-        throw new Error("Unable to evaluate card value");
-      }
-      value += cardValue;
-      if(i == 1 && value == 21){
-        return "BlackJack";
-      }
-    }
+    Interface.renderCard(card, input);
+    Interface.setScore(handVal, input)
 
-    //devalue aces if the push the value over 21
-    if (value > 21 && aceCounter > 0){ 
-      for (let i = 0; i < aceCounter && value > 21; i++){
-        value -= 10;
-        logString += " - 10";
-      }
-    }
-
-    console.log(`${logString} = ${value} AceCounter = ${aceCounter}`);
-    //check for "BUST!"
-    if (value > 21){        
-      return "Bust";      
-    }
-
-    return value;
-  }
-  const _seatPlayers = (n) => {
-    let i = 0;
-    while (i < n) {
-      _players.push(new Player());
-      _hands[i] = _players[i].cards;
-      i++
-    }
+    console.log(`Player ${input[0] + 1} was dealt a ${card}.`);
   }
   const _endRound = (result) => {
     console.log("endRound called :" + result);
@@ -209,20 +267,25 @@ const GameDirector = (function(){
   return {
     start () {
       console.log("start called");
-      _seatPlayers(2);
       _deck.shuffleDeck();
       Interface.setWallet(_players[1].wallet);
       Interface.hideModules();
       Interface.dispBetScreen();
     },
-    hitPlayer () {
-      _dealCard(1);
-      let playerHand = _evalHand(_hands[1]);
-      Interface.setScore(playerHand, 1);
+    hitPlayer (i) {
+      const playerIndex = 1;
+      const input = [playerIndex, i]
+
+      //dealCard to hand it was called from
+      _dealCard(input);
+
+      //fetch value of calling hand and use to determin available action
+      let playerHand = _players[playerIndex].handValue[i];
+      Interface.setScore(playerHand, input);
       if (playerHand < 21)
         return true;
-      if (playerHand == "Bust" || playerHand === 21){
-        Interface.setHandBlocker(playerHand);
+      else if (playerHand >= 21){
+        Interface.setHandBlocker(_players[playerIndex].getState[i]);
         setTimeout(()=>{
           this.dealersTurn();
         }, 2000);
@@ -232,58 +295,63 @@ const GameDirector = (function(){
       Interface.setHandBlocker(`Stay at ${_evalHand(_hands[1])}`);
       this.dealersTurn();
     },
-    doublePlayer () {
-      _players[1].wallet -= _betHolder;
-      Interface.setWallet(_players[1].wallet);
-      _betHolder *= 2;
-      const dealersTurn = this.hitPlayer();
-      if (dealersTurn == true) this.stayPlayer();
+    doublePlayer (i) {
+      _players[1].double(i);
+      const notBust = this.hitPlayer(); //returns true if the player has not busted. If they have pusted the dealer's turn will be triggered in hitPlayer();
+      if (notBust) this.stayPlayer();
     },
     dealersTurn () {
-      console.log("dealers turn called");    
-      const dealerHand = _evalHand(_hands[0]);
-      Interface.setScore(dealerHand, 0);
-      if (dealerHand <= 16 && typeof dealerHand == "number"){
-        _dealCard(0);
+      console.log("dealers turn called");
+      const dealersIndex = 0; 
+      const dealerHand = _players[dealersIndex].handValue;
+      const input = [dealersIndex, 0];
+      Interface.setScore(dealerHand, input);
+      if (dealerHand <= 16 ){
+        _dealCard(input);
         setTimeout(()=>{
           this.dealersTurn();
         }, 1500);      
       } else {
         if (dealerHand <= 21) {
-          Interface.setDealerBlocker(`Stay at ${dealerHand}`);
+          Interface.setDealerBlocker(`Stays at ${dealerHand}`);
         } else {
-          Interface.setDealerBlocker(dealerHand);
+          Interface.setDealerBlocker(_players[dealersIndex].getState()[0]);
         }
         this.endGameEval();
       }
     },
-    resetTable () {
-      console.log("resetTable called");
+    setTable (bet) {
+      console.log("setTable called");
       const strtCards = 2;
       const dealersIndex = 0;
       const playerIndex = 1;
-      _hands.forEach((cards) => {   //move all players cards to deck discard
-        while (0 < cards.length){
-          _deck.discard(cards.pop());
-        }
+      
+      _players[1].bet(bet);
+
+      _hands.forEach((hands) => {   //move all players cards to deck discard
+        hands.forEach((cards)=>{
+          while (0 < cards.length){
+            _deck.discard(cards.pop());
+          }
+        });
       });
+
       Interface.setWallet(_players[1].wallet);
       Interface.clearHands();
       Interface.hideModules();
-      for (let i = 0; i < strtCards; i++){  //deal n cards...
-        for (let j = 0; j < _hands.length; j++){ //...to each hand in _hand
-          _dealCard(j)          
+      for (let i = 0; i < strtCards; i++){  //deal strtCards cards...
+        for (let j = 0; j < _players.length; j++){ //...to each player's first hand.
+          _dealCard([j, 0]);    
         }
       }
       
-      Interface.setScore(_evalHand(_hands[dealersIndex]), dealersIndex);  //eval player and dealer so scores can be set
-      let playerHand = _evalHand(_hands[playerIndex]);         //keep player score for BlackJack eval
-      Interface.setScore(playerHand, playerIndex);
+      Interface.setScore(_players[dealersIndex].handValue[0], dealersIndex);  //eval player and dealer so scores can be set
+      Interface.setScore(_players[playerIndex].handValue[0], playerIndex);
       Interface.toggleBtnDisabled();
   
-      if (playerHand == "BlackJack"){           //if the player has black jack
-        Interface.setHandBlocker(playerHand);        //set set his hand to BlackJack
-        this.dealersTurn();                           //let the dealer go
+      if (_players[playerIndex].getState()[0] == "BlackJack"){  //if the player has black jack
+        Interface.setHandBlocker("BlackJack");                 //set set his hand to BlackJack
+        this.dealersTurn();                                   //let the dealer go
       }
     },
     endGameEval () {
@@ -311,11 +379,6 @@ const GameDirector = (function(){
       }
 
       _endRound(result);
-    },
-    placeBet(bet) {
-      _players[1].wallet -= bet;
-      _betHolder += bet;
-      this.resetTable()
     },
     handCheck () {
       console.log(`Discard Pile: ${_deck.reportDiscard()}`);
