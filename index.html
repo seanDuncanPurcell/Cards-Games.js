@@ -58,7 +58,7 @@
 <!-- Player -->
     <span class="playerArea">
       <span class="cover">
-        <span id="handBlocker" class="blocker">Sample</span>
+        <span id="handBlocker0" class="blocker">Sample</span>
       </span>
       <div></div>
       <div class="hand">
@@ -66,15 +66,15 @@
       <div id="sideControl">
         <em>Score: </em> <p class="scoreHolder">000</p> <br>
         <p id="playerWallet">000.00</p>
-        <button class="hitStay" onclick="GameDirector.hitPlayer()" disabled>Hit</button>
-        <button class="hitStay" onclick="GameDirector.stayPlayer()" disabled>Stay</button>
-        <button class="hitStay" onclick="GameDirector.doublePlayer(0)" disabled>Double</button>
-        <button id="split" class="hitStay" onclick="GameDirector.split()" disabled>Split</button>
+        <button class="hitStay pan0" onclick="GameDirector.hitPlayer(0)" disabled>Hit</button>
+        <button class="hitStay pan0" onclick="GameDirector.stayPlayer(0)" disabled>Stay</button>
+        <button class="hitStay pan0" onclick="GameDirector.doublePlayer(0)" disabled>Double</button>
+        <button class="hitStay pan0" id="split" onclick="GameDirector.split()" disabled>Split</button>
       </div>
     </span>
   </div>
   
-  <span class="playerArea" id="splitArea" style="display: none;">
+  <span class="playerArea1" id="splitArea" style="display: none;">
     <span class="cover">
       <span id="handBlocker" class="blocker">Sample</span>
     </span>
@@ -83,9 +83,9 @@
     </div>
     <div id="sideControl2">
       <em>Score: </em> <p class="scoreHolder">000</p> <br>
-      <button class="hitStay" onclick="GameDirector.hitPlayer()" disabled>Hit</button>
-      <button class="hitStay" onclick="GameDirector.stayPlayer()" disabled>Stay</button>
-      <button class="hitStay" onclick="GameDirector.doublePlayer(1)" disabled>Double</button>
+      <button class="hitStay pan1" onclick="GameDirector.hitPlayer(1)" disabled>Hit</button>
+      <button class="hitStay pan1" onclick="GameDirector.stayPlayer(1)" disabled>Stay</button>
+      <button class="hitStay pan1" onclick="GameDirector.doublePlayer(1)" disabled>Double</button>
     </div>
   </span>
 </div>
