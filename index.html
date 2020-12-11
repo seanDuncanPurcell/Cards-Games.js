@@ -27,13 +27,13 @@
         Place your bet.
       </h1>
       <Span>
-        <button onclick="GameDirector.placeBet(5);">
+        <button onclick="GameDirector.setTable(5);">
           $5
         </button>
-        <button onclick="GameDirector.placeBet(20);">
+        <button onclick="GameDirector.setTable(20);">
           $20
         </button>
-        <button onclick="GameDirector.placeBet(50);">
+        <button onclick="GameDirector.setTable(50);">
           $50
         </button>
       </Span>
@@ -56,38 +56,42 @@
     <span></span>
 
 <!-- Player -->
-    <span class="playerArea">
-      <span class="cover">
-        <span id="handBlocker0" class="blocker">Sample</span>
-      </span>
-      <div></div>
-      <div class="hand">
+    <span id="southEnd">
+      <div id='handOne' class="playerArea">
+        <span class="cover">
+          <span id="handBlocker0" class="blocker">Sample</span>
+        </span>
+        <div></div>
+        <div class="hand">
+        </div>
+        <div id="sideControl" class="sideControl" >
+          <em>Score: </em> <p class="scoreHolder">000</p> <br>
+          <p id="playerWallet">000.00</p>
+          <button class="hitStay pan0" onclick="GameDirector.hitPlayer(0)" disabled>Hit</button>
+          <button class="hitStay pan0" onclick="GameDirector.stayPlayer(0)" disabled>Stay</button>
+          <button class="hitStay pan0" onclick="GameDirector.doublePlayer(0)" disabled>Double</button>
+          <button class="hitStay pan0" id="split" onclick="GameDirector.splitPlayer()" disabled>Split</button>
+        </div>
       </div>
-      <div id="sideControl">
-        <em>Score: </em> <p class="scoreHolder">000</p> <br>
-        <p id="playerWallet">000.00</p>
-        <button class="hitStay pan0" onclick="GameDirector.hitPlayer(0)" disabled>Hit</button>
-        <button class="hitStay pan0" onclick="GameDirector.stayPlayer(0)" disabled>Stay</button>
-        <button class="hitStay pan0" onclick="GameDirector.doublePlayer(0)" disabled>Double</button>
-        <button class="hitStay pan0" id="split" onclick="GameDirector.split()" disabled>Split</button>
-      </div>
+      <div id='handTwo' class="playerArea">
+        <span class="playerArea" id="splitArea" style="display: none;">
+          <span class="cover">
+            <span id="handBlocker1" class="blocker">Sample</span>
+          </span>
+          <div class="hand">
+          </div>
+          <div id="sideControl2" class="sideControl">
+            <em>Score: </em> <p class="scoreHolder">000</p> <br>
+            <button class="hitStay pan1" onclick="GameDirector.hitPlayer(1)" disabled>Hit</button>
+            <button class="hitStay pan1" onclick="GameDirector.stayPlayer(1)" disabled>Stay</button>
+            <button class="hitStay pan1" onclick="GameDirector.doublePlayer(1)" disabled>Double</button>
+          </div>
+        </span>
+      </div>      
     </span>
   </div>
   
-  <span class="playerArea1" id="splitArea" style="display: none;">
-    <span class="cover">
-      <span id="handBlocker" class="blocker">Sample</span>
-    </span>
-    <div></div>
-    <div class="hand">
-    </div>
-    <div id="sideControl2">
-      <em>Score: </em> <p class="scoreHolder">000</p> <br>
-      <button class="hitStay pan1" onclick="GameDirector.hitPlayer(1)" disabled>Hit</button>
-      <button class="hitStay pan1" onclick="GameDirector.stayPlayer(1)" disabled>Stay</button>
-      <button class="hitStay pan1" onclick="GameDirector.doublePlayer(1)" disabled>Double</button>
-    </div>
-  </span>
+
 </div>
   <footer>
     <p>
