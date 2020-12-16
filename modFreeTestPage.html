@@ -8,8 +8,8 @@
 </head>
 <body>
   <div id="table_top">
-<!-- Dealer -->
-    <span class="playerArea">
+    <!-- Dealer -->
+    <section class="playerArea">
       <span class="cover">
         <span id="dealerBlocker" class="blocker">Sample</span>
       </span>
@@ -19,13 +19,17 @@
       <div id="sideControl">
         <em>Score: </em> <p class="scoreHolder">000</p>
       </div>
-    </span>
+    </section>
 
-<!-- Center divider -->
-    <span></span>
+    <!-- Center divider -->
+    <section>      
+      <span class="cover">
+        <span id="handBlocker0" class="blocker">Sample 01</span>
+      </span>
+    </section>
 
-<!-- Player -->
-    <span id="southEnd">
+    <!-- Player -->
+    <section id="southEnd">
       <div id='handOne' class="playerArea">
         <span class="cover">
           <span id="handBlocker0" class="blocker">Sample 01</span>
@@ -64,7 +68,7 @@
           <button class="hitStay pan1" onclick="GameDirector.doublePlayer(1)" disabled>Double</button>
         </div>
       </span>  
-    </span>
+    </section>
   </div>
   
 

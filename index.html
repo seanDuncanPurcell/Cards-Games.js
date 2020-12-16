@@ -7,22 +7,15 @@
   <title>Black Jack</title>
 </head>
 <body>
-  <div id="table_top">
+  <main id="table_top">
 
-    <span id="newGame" class="cover">
+    <section id="newGame" class="cover">
       <button onclick="GameDirector.start()">
         Click to start a new game
       </button>
-    </span>
-
-    <span id="resultScreen" class="cover" style="display: none;">
-      <h1 id="handResult" style="color: whitesmoke;">Sampl Result</h1>
-      <button onclick="Interface.dispBetScreen();">
-        Deal Next Hand
-      </button>
-    </span>
+    </section>
     
-    <span id="betScreen" class="cover" style="display: none;">
+    <section id="betScreen" class="cover" style="display: none;">
       <h1 style="color: whitesmoke;">
         Place your bet.
       </h1>
@@ -37,10 +30,10 @@
           $50
         </button>
       </Span>
-    </span>
+    </section>
 
-<!-- Dealer -->
-    <span class="playerArea">
+    <!-- Dealer -->
+    <section class="playerArea">
       <span class="cover">
         <span id="dealerBlocker" class="blocker">Sample</span>
       </span>
@@ -50,18 +43,22 @@
       <div id="sideControl">
         <em>Score: </em> <p class="scoreHolder">000</p>
       </div>
-    </span>
+    </section>
 
-<!-- Center divider -->
-    <span></span>
+    <!-- Center divider -->
+    <section>
+      <span class="cover">
+        <span id="_resultsDisplay" class="blocker">Sample</span>
+      </span>
+    </section>
 
-<!-- Player -->
-    <span id="southEnd">
+    <!-- Player -->
+    <section id="southEnd">
       <div id='handOne' class="playerArea">
         <span class="cover">
           <span id="handBlocker0" class="blocker">Sample</span>
         </span>
-        <div></div>
+        <div></div> <!-- space holder -->
         <div class="hand">
         </div>
         <div id="sideControl" class="sideControl" >
@@ -87,14 +84,14 @@
           <button class="hitStay pan1" onclick="GameDirector.doublePlayer(1)" disabled>Double</button>
         </div>
       </span>        
-    </span>
-  </div>
+    </section>
+  </main>
   
 
 </div>
   <footer>
     <p>
-      Page behavior defined in JaveScript <a href="https://github.com/seanDuncanPurcell/Cards-Games.js">GitHub Cards-Games</a>. <br>
+      Game behavior and display defined at my <a href="https://github.com/seanDuncanPurcell/Cards-Games.js">GitHub repo. 'Cards-Games.js'</a>. <br>
       Card SVG images sourced via <a href="https://commons.wikimedia.org/wiki/File:2H.svg">Adrian Kennard</a>, CC0, via Wikimedia Commons.
     </p>
   </footer>
