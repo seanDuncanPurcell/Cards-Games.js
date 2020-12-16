@@ -1,3 +1,4 @@
 List bugs here!
 
 1) For some reason the .svg files are being intermitently block by 'client'. I set up a loop to try the fetch() three times but each time renders the same failure. 
+    a. After some play testing it looks like it is the Ace of Dimonds that does not want to load.
