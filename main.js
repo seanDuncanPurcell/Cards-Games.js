@@ -144,15 +144,26 @@ const Interface = (function () {
   const _hands = document.getElementsByClassName("hand");
   const _newCard = async (suit) => {
     const card = document.createElement("div");
-    const img = document.createElement("img");
+    const imgFrnt = document.createElement("img");
+    const imgBck = document.createElement("img");
     card.className = "card";
     
-    const data = await fetch(`./img/${suit}.svg`);
-    if(!data.ok) throw new Error('Data failed to load');
-    const blob = await data.blob();
-    const svgURL = await URL.createObjectURL(blob);
-    img.src = svgURL;
-    card.appendChild(img);
+    const crdFaceData = await fetch(`./img/${suit}.svg`);
+    if(!crdFaceData.ok) throw new Error('Data failed to load');
+    const blobF = await crdFaceData.blob();
+    const svgURL = await URL.createObjectURL(blobF);
+    imgFrnt.src = svgURL;
+    imgFrnt.className = "cardFront";
+    card.appendChild(imgFrnt);
+
+    const crdBckData = await fetch("./img/Card_back_01.svg");
+    if(!crdBckData.ok) throw new Error('Data failed to load');
+    const blobB = await crdBckData.blob();
+    const svgURLB = await URL.createObjectURL(blobB);
+    imgBck.src = svgURLB;
+    imgBck.className = "cardBack";
+    card.appendChild(imgBck);
+
     return card;
   }
   return {
@@ -182,7 +193,7 @@ const Interface = (function () {
         try {
           const card = await _newCard(suit)
           _hands[player + hand].appendChild(card);
-          break;
+          return card;
         } catch (SomeException) {
           if (++count == maxTries){
             console.error(SomeException);
@@ -190,8 +201,7 @@ const Interface = (function () {
             //alert user of fail and start new hand.
           }
         }
-      }
-      console.log(`card rendered for player ${player} in hand ${hand}`);
+      }      
     },
     setScore (value, input) {
       const index = input[0] + input[1];
@@ -207,17 +217,21 @@ const Interface = (function () {
       const number = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'USD' }).format(num);
       wallet.innerHTML = number;
     },
-    setHandBlocker (result, i) {
-      console.log("handBlocker called");
-      const elmt = document.getElementById(`handBlocker${i}`);
-      elmt.innerHTML = result;
-      this.btnsDisable(i);
-      elmt.parentElement.style.display = 'flex';
+    setHandBlocker (result, i, time = 750) {
+      setTimeout(()=>{
+        console.log("handBlocker called");
+        const elmt = document.getElementById(`handBlocker${i}`);
+        elmt.innerHTML = result;
+        this.btnsDisable(i);
+        elmt.parentElement.style.display = 'flex';
+      },time);
     },
     setDealerBlocker (text) {
-      const elmt = document.getElementById("dealerBlocker");
-      elmt.innerHTML = text;
-      elmt.parentElement.style.display = 'flex';
+      setTimeout(()=>{
+        const elmt = document.getElementById("dealerBlocker");
+        elmt.innerHTML = text;
+        elmt.parentElement.style.display = 'flex';
+      }, 750);
     },
     showRsltScreen (result) {
       const elmn = document.getElementById("handResult");
@@ -243,31 +257,40 @@ const Interface = (function () {
       handB.style.display ='grid';
       handB.style.position ='relative';
       
-      const card = _hands[1].lastChild
+      const card = _hands[1].lastChild;
+      card.classList.remove('flip');
       _hands[2].appendChild(card);
+      setTimeout(()=> {
+        card.classList.add('flip');
+      } ,250);
+    },
+    flipDealer() {
+      setTimeout(()=>{_hands[0].firstChild.classList.add('flip');}, 500);      
     }
   }
 })();
 
 const GameDirector = (function(){
   let _playerHasSplit = false;
-  const _hesitateShort = 1500;
-  const _hesitateLong = 3000;  
+  const _hesitateShort = 2000;
+  const _hesitateLong = 3500;  
   const _table = new Table();
   const _deck = _table.deck;
   const _players = _table.players;
-  const _dealCard = (input) => {
+  const _dealCard = async (input) => {
     if (_deck.reportCards().length <= 1) _deck.shuffleDiscards();
 
     const [player, hand] = input;
     const card = _table.dealCard(input);
     const handVal = _players[player].handValue[hand];    
     
-    Interface.renderCard(card, input);
+    const element = await Interface.renderCard(card, input);
     Interface.setScore(handVal, input);
 
     console.log(`Player ${player + 1} was dealt a ${card}.`);
     console.log(`their new hand value is ${handVal}.`);
+
+    return element;
   }
   const _endRound = () => {
     console.log('end of game eval called');
@@ -327,12 +350,13 @@ const GameDirector = (function(){
       Interface.setWallet(_players[1].wallet);
       Interface.dispBetScreen();
     },
-    hitPlayer (i) {
+    async hitPlayer (i) {
       const playerIndex = 1;
       const input = [playerIndex, i]
 
       //dealCard to hand it was called from
-      _dealCard(input);
+      const crd = await _dealCard(input);
+      setTimeout(()=>crd.classList.add('flip'), 250);
 
       //fetch value of calling hand and use to determin available action
       let playerHand = _players[playerIndex].handValue[i];
@@ -344,12 +368,12 @@ const GameDirector = (function(){
         else if (playerHand > 21) Interface.setHandBlocker("Bust", i);
 
         //if the player has not split or they are busting on the second hand, then call the dealers turn.
-        if (!_playerHasSplit || i == 1) setTimeout(() => this.dealersTurn(), _hesitateShort);
+        if (!_playerHasSplit || i == 1) this.dealersTurn(_hesitateLong);
         else Interface.btnsEnable(1);
       }
     },
     stayPlayer (i) {
-      Interface.setHandBlocker(`Stay at ${_players[1].handValue[i]}`, i);
+      Interface.setHandBlocker(`Stay at ${_players[1].handValue[i]}`, i, 250);
       if(!_playerHasSplit || i === 1) this.dealersTurn();
       else Interface.btnsEnable(1);
     },
@@ -374,14 +398,16 @@ const GameDirector = (function(){
       Interface.setScore(_players[1].handValue[1], [1,1]);      
       Interface.setScore(_players[1].handValue[0], [1,0]);
     },
-    dealersTurn () {
+    dealersTurn (time = 2000) {
       console.log("dealers turn called");
       const dealersIndex = 0; 
       const input = [dealersIndex, 0];
-      setTimeout(dealersCard = () => {
+      Interface.flipDealer();
+      setTimeout(dealersCard = async () => {
         const dealerHand = _players[dealersIndex].handValue[0];
         if (dealerHand <= 16 ){
-          _dealCard(input);
+          let crd = await _dealCard(input);
+          setTimeout(()=>crd.classList.add('flip'), 250);
           setTimeout(dealersCard, _hesitateShort);
         } else {
           if (dealerHand <= 21) {
@@ -392,9 +418,9 @@ const GameDirector = (function(){
           }
           _endRound();
         }
-      }, _hesitateShort);
+      }, time);
     },
-    setTable (bet) {
+    async setTable (bet) {
       console.log("setTable called");
       const strtCards = 2;
       const dealersIndex = 0;
@@ -419,7 +445,8 @@ const GameDirector = (function(){
       Interface.hideModules();
       for (let i = 0; i < strtCards; i++){  //deal strtCards cards...
         for (let j = 0; j < _players.length; j++){ //...to each player's first hand.
-          _dealCard([j, 0]);    
+          let crd = await _dealCard([j, 0]);
+          if (i == 1 || j == 1) setTimeout(()=>crd.classList.add('flip'), 250);
         }
       }
       
@@ -431,7 +458,7 @@ const GameDirector = (function(){
   
       if (_players[playerIndex].handValue[0] == "BlackJack"){  //if the player has black jack
         Interface.setHandBlocker("BlackJack", 0);                 //set set his hand to BlackJack
-        this.dealersTurn();                                   //let the dealer go
+        this.dealersTurn(_hesitateLong);                                   //let the dealer go
       }
     },
     handCheck () {

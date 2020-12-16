@@ -22,6 +22,11 @@ button {
   border: 1px solid black;
 }
 
+#table_top > span {
+  border: 1px solid blue;
+  margin: 2px;
+}
+
 #newGame, #resultScreen {
   z-index: 4;
 }
@@ -33,6 +38,7 @@ button {
 
 .cover{  
   display: flex;
+  /* display: none; */
   position: absolute;
   z-index: 3;
   width: 100%;
@@ -73,8 +79,8 @@ button {
 }
 
 .playerArea  {
-  display: grid;
   position: relative;
+  display: grid;
   grid-template-columns: 1fr auto 1fr;
   width: 100%;
 }
@@ -85,31 +91,40 @@ button {
 }
 
 .hand {
-  border: 1px solid red;
-  margin: 2px;
-  width: fit-content;
-  min-width: 400px;
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
   column-gap: 5px;
-}
-
-#table_top > span {
-  border: 1px solid blue;
+  border: 1px solid red;
   margin: 2px;
+  width: fit-content;
+  min-width: 400px;
+  perspective: 1000px;
 }
 
 .card {
+  position: relative;
   border: 1px solid green;
-  /* display: flex;
-  justify-content: center;
-  align-items: center; */
+  height: 26.8vh;
+  width: 18vh;
+  transform-style: preserve-3d;
+  transition: transform .5s;
+  box-shadow: 1px 1px 1px rgba(0,0,0,.3);
+}
+
+.card.flip {
+  transform: rotateY(180deg);
 }
 
 .card img {  
-  height: 26.8vh;
-  width: 18vh;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+}
+.cardFront{
+  transform: rotateY(180deg);
 }
 
 .sideControl {
