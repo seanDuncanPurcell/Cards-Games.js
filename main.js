@@ -2,6 +2,8 @@
 // ...a 2d array due to the need have a second player hand for when the player splits.
 // ...still not sure if there is a better way to do this.
 
+//Add all unfixed bugs to bugs.txt
+
 
 class Player {
   constructor(){
@@ -238,7 +240,8 @@ const Interface = (function () {
     },
     split() {
       const handB = document.getElementById('splitArea');
-      handB.style.display ='flex';
+      handB.style.display ='grid';
+      handB.style.position ='relative';
       
       const card = _hands[1].lastChild
       _hands[2].appendChild(card);

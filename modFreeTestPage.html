@@ -8,37 +8,6 @@
 </head>
 <body>
   <div id="table_top">
-
-    <span id="newGame" class="cover">
-      <button onclick="GameDirector.start()">
-        Click to start a new game
-      </button>
-    </span>
-
-    <span id="resultScreen" class="cover" style="display: none;">
-      <h1 id="handResult" style="color: whitesmoke;">Sampl Result</h1>
-      <button onclick="Interface.dispBetScreen();">
-        Deal Next Hand
-      </button>
-    </span>
-    
-    <span id="betScreen" class="cover" style="display: none;">
-      <h1 style="color: whitesmoke;">
-        Place your bet.
-      </h1>
-      <Span>
-        <button onclick="GameDirector.setTable(5);">
-          $5
-        </button>
-        <button onclick="GameDirector.setTable(20);">
-          $20
-        </button>
-        <button onclick="GameDirector.setTable(50);">
-          $50
-        </button>
-      </Span>
-    </span>
-
 <!-- Dealer -->
     <span class="playerArea">
       <span class="cover">
@@ -59,9 +28,9 @@
     <span id="southEnd">
       <div id='handOne' class="playerArea">
         <span class="cover">
-          <span id="handBlocker0" class="blocker">Sample</span>
+          <span id="handBlocker0" class="blocker">Sample 01</span>
         </span>
-        <div></div>
+        <div></div> <!-- space holder -->
         <div class="hand">
         </div>
         <div id="sideControl" class="sideControl" >
@@ -86,7 +55,7 @@
           <button class="hitStay pan1" onclick="GameDirector.stayPlayer(1)" disabled>Stay</button>
           <button class="hitStay pan1" onclick="GameDirector.doublePlayer(1)" disabled>Double</button>
         </div>
-      </span>        
+      </span>  
     </span>
   </div>
   
