@@ -1,1 +1,3 @@
-[] After players and dealer ending round with "20" restule returned "none"
+List bugs here!
+
+1) For some reason the .svg files are being intermitently block by 'client'. I set up a loop to try the fetch() three times but each time renders the same failure. 

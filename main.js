@@ -1,5 +1,6 @@
 // Convention: The location of a players individual hand is indicated by...
 // ...a 2d array due to the need have a second player hand for when the player splits.
+// ...still not sure if there is a better way to do this.
 
 
 class Player {
@@ -124,7 +125,7 @@ class Table {
         logString += " - 10";
       }
     }
-    console.log(`player${input} with ${logString} = ${value} AceCounter = ${aceCounter}`);
+    // console.log(`player${input} with ${logString} = ${value} AceCounter = ${aceCounter}`);
     handVal[y] = value;
   }
   dealCard(input){
@@ -139,11 +140,16 @@ class Table {
 
 const Interface = (function () {
   const _hands = document.getElementsByClassName("hand");
-  const _newCard = (suit) => {
-    let card = document.createElement("div");
-    let img = document.createElement("img");
+  const _newCard = async (suit) => {
+    const card = document.createElement("div");
+    const img = document.createElement("img");
     card.className = "card";
-    img.src = `./img/${suit}.svg`;
+    
+    const data = await fetch(`./img/${suit}.svg`);
+    if(!data.ok) throw new Error('Data failed to load');
+    const blob = await data.blob();
+    const svgURL = await URL.createObjectURL(blob);
+    img.src = svgURL;
     card.appendChild(img);
     return card;
   }
@@ -153,23 +159,37 @@ const Interface = (function () {
 
       // btns.forEach(btn => btn.setAttribute('disabled', ''));
       for (let i = 0; i < btns.length; i++){
-        btns[i].setAttribute('disabled', '');        
-        console.log('butten ' + i + ' disabled ');
+        btns[i].setAttribute('disabled', '');
       }
     },
     btnsEnable (i) {
       let btns = document.getElementsByClassName("pan" + i);
 
       for (let i = 0; i < btns.length; i++){
-        btns[i].removeAttribute('disabled');        
-        console.log('butten ' + i + ' enabled ');
+        btns[i].removeAttribute('disabled');
       }
 
     },
-    renderCard (suit, input) {
+    async renderCard (suit, input) {
       const [player, hand] = input;
-      console.log(`card rendered for ${player} at index ${hand}`);
-      _hands[player + hand].appendChild(_newCard(suit));
+
+      //While running on localhost my GET was being rejected by client, so this re-try block may not be needed in a real server.
+      let count = 0;
+      const maxTries = 3;
+      while(true) {
+        try {
+          const card = await _newCard(suit)
+          _hands[player + hand].appendChild(card);
+          break;
+        } catch (SomeException) {
+          if (++count == maxTries){
+            console.error(SomeException);
+            break;
+            //alert user of fail and start new hand.
+          }
+        }
+      }
+      console.log(`card rendered for player ${player} in hand ${hand}`);
     },
     setScore (value, input) {
       const index = input[0] + input[1];
@@ -196,7 +216,6 @@ const Interface = (function () {
       const elmt = document.getElementById("dealerBlocker");
       elmt.innerHTML = text;
       elmt.parentElement.style.display = 'flex';
-      console.log("dealer Blocker called, Elmn set to: " + elmt.parentElement.style.display);
     },
     showRsltScreen (result) {
       const elmn = document.getElementById("handResult");
@@ -229,7 +248,8 @@ const Interface = (function () {
 
 const GameDirector = (function(){
   let _playerHasSplit = false;
-  let _hesitate = 1500;
+  const _hesitateShort = 1500;
+  const _hesitateLong = 3000;  
   const _table = new Table();
   const _deck = _table.deck;
   const _players = _table.players;
@@ -264,7 +284,7 @@ const GameDirector = (function(){
       if (result == "Win") _players[1].wallet += (playerBets[i] * 2);
       else if (result == "Push") _players[1].wallet += playerBets[i];
       else if (result == "BlackJack") _players[1].wallet += (playerBets[i] * 2.5);
-      else if (result != "Lose") console.log("bet failed with " + result);
+      else if (result != "Lose") throw new Error("bet failed with " + result);
       console.log(`Bet payed out at ${playerBets[i]}`)
 
       playerBets[i] = 0;
@@ -275,7 +295,7 @@ const GameDirector = (function(){
         Interface.setHandBlocker(result, i);
     }
     //promt player to play again;    
-    setTimeout(Interface.dispBetScreen, 3000);
+    setTimeout(Interface.dispBetScreen, _hesitateLong);
   }
   const _handCompare = (player, dealer) => {
     let result = "none";
@@ -315,12 +335,14 @@ const GameDirector = (function(){
       let playerHand = _players[playerIndex].handValue[i];
       Interface.setScore(playerHand, input);
       if (playerHand < 21) return true;
-      else {
+      else if (playerHand >= 21) {
         if (playerHand == 21) Interface.setHandBlocker("21", i);
-        if (playerHand > 21) Interface.setHandBlocker("Bust", i);        
-        setTimeout(()=>{
-          this.dealersTurn();
-        }, _hesitate);
+        else if (playerHand == 'BlackJack') Interface.setHandBlocker("21", i);
+        else if (playerHand > 21) Interface.setHandBlocker("Bust", i);
+
+        //if the player has not split or they are busting on the second hand, then call the dealers turn.
+        if (!_playerHasSplit || i == 1) setTimeout(() => this.dealersTurn(), _hesitateShort);
+        else Interface.btnsEnable(1);
       }
     },
     stayPlayer (i) {
@@ -357,7 +379,7 @@ const GameDirector = (function(){
         const dealerHand = _players[dealersIndex].handValue[0];
         if (dealerHand <= 16 ){
           _dealCard(input);
-          setTimeout(dealersCard, _hesitate);
+          setTimeout(dealersCard, _hesitateShort);
         } else {
           if (dealerHand <= 21) {
             Interface.setDealerBlocker(`Stays at ${dealerHand}`);
@@ -367,7 +389,7 @@ const GameDirector = (function(){
           }
           _endRound();
         }
-      }, 1000);
+      }, _hesitateShort);
     },
     setTable (bet) {
       console.log("setTable called");
@@ -376,7 +398,8 @@ const GameDirector = (function(){
       const playerIndex = 1;
       const allHands = [_players[0].hands, _players[1].hands];
       const handB = document.getElementById('splitArea');
-      handB.style.display ='none';   
+      handB.style.display ='none';
+      _playerHasSplit = false;
       
       _players[1].bet(bet);
 
