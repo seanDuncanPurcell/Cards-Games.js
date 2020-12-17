@@ -25,8 +25,8 @@ class Player {
       this.wallet -= num;
     }
     this.double = (i) => {
-      this.wallet - this.bet[i];
-      this.bet[i] *=  2;
+      this.wallet -= this.betHolder[i];
+      this.betHolder[i] *=  2;
     }
     this.split = () => {      
       this.wallet -= this.betHolder[0];
@@ -221,8 +221,6 @@ const Interface = (function () {
       const elmt = document.querySelector("#betBtnHolder");
       elmt.style.display = 'none';
       _noticeDisply.innerText = 'Your Turn';
-
-      document.getElementById('sideControl').style.display = 'block';
     },
     flipDealer() {
       _hands[0].lastChild.classList.add('flip');
@@ -316,10 +314,9 @@ const GameDirector = (function(){
     elmt.addEventListener('click', _firstDeal);
     elmt.innerText = "Deal Cards";
     Interface.hideModules();
-
   }
   const _firstDeal = () => {
-    const time = 250;
+    const time = 500;
     const strtCards = 4;
     let i = 1;
     setTimeout( async function firstdeal () {
@@ -334,6 +331,9 @@ const GameDirector = (function(){
     .removeEventListener('click', _firstDeal);
 
     Interface.dispBetMod();
+    setTimeout(()=>{
+      document.getElementById('sideControl').style.display = 'block';
+    }, 2000); 
   }
   const _dealCard = async (input) => {
     if (_deck.reportCards().length <= 1) _deck.shuffleDiscards();
@@ -372,7 +372,7 @@ const GameDirector = (function(){
     }, time);
   }
   const _endRound = () => {
-    console.log('end of game eval called');
+    console.log('endRound called');
     const dealersIndex = 0; 
     const dealerHand = _players[dealersIndex].handValue[0];
     const playersIndex = 1; 
@@ -410,9 +410,10 @@ const GameDirector = (function(){
       if (result != undefined) Interface.setHandBlocker(result, i);
     }    
     Interface.setWallet(_players[1].wallet);
+    console.log('wallet show:' + _players[1].wallet);
+    document.getElementById("resultsDisplay").addEventListener('click', _clearTable);
     Interface.showRslt(winnings);
 
-    document.getElementById("resultsDisplay").addEventListener('click', _clearTable);
   }
   const _handCompare = (player, dealer) => {
     let result = "none";
@@ -463,9 +464,9 @@ const GameDirector = (function(){
         else Interface.btnsEnable(1);
       }
     },
-    doublePlayer (i) {
+    async doublePlayer (i) {
       _players[1].double(i);
-      const notBust = this.hitPlayer(i); //returns true if the player has not busted. If they have pusted the dealer's turn will be triggered in hitPlayer();
+      const notBust = await this.hitPlayer(i); //returns true if the player has not busted. If they have pusted the dealer's turn will be triggered in hitPlayer();
       if (notBust) this.stayPlayer(i);
     },
     placeBet(bet) {
@@ -480,7 +481,7 @@ const GameDirector = (function(){
         card.classList.add('flip');
         i++;
         if(i < _firstCards.length) setTimeout(crdFlips, 250)
-      }, 250)
+      }, 100)
       //eval player so scores can be set and btns enabled
       Interface.setScore(_players[playerIndex].handValue[0], 0);
       Interface.setWallet(_players[playerIndex].wallet);
