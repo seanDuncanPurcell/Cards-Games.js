@@ -8,30 +8,6 @@
 </head>
 <body>
   <main id="table_top">
-
-    <section id="newGame" class="cover">
-      <button onclick="GameDirector.start()">
-        Click to start a new game
-      </button>
-    </section>
-    
-    <section id="betScreen" class="cover" style="display: none;">
-      <h1 style="color: whitesmoke;">
-        Place your bet.
-      </h1>
-      <Span>
-        <button onclick="GameDirector.setTable(5);">
-          $5
-        </button>
-        <button onclick="GameDirector.setTable(20);">
-          $20
-        </button>
-        <button onclick="GameDirector.setTable(50);">
-          $50
-        </button>
-      </Span>
-    </section>
-
     <!-- Dealer -->
     <section class="playerArea">
       <span class="cover">
@@ -40,15 +16,19 @@
       <div></div>
       <div class="hand">
       </div>
-      <div id="sideControl">
-        <em>Score: </em> <p class="scoreHolder">000</p>
+      <div class="sideControl">
       </div>
     </section>
 
     <!-- Center divider -->
     <section>
-      <span class="cover">
-        <span id="_resultsDisplay" class="blocker">Sample</span>
+      <span>
+        <span id="resultsDisplay" >Deal Cards</span>
+        <span id="betBtnHolder">
+          <button class="betBtns" onclick="GameDirector.placeBet(10)">$10.00</button>
+          <button class="betBtns" onclick="GameDirector.placeBet(50)">$50.00</button>
+          <button class="betBtns" onclick="GameDirector.placeBet(100)">$100.00</button>
+        </span>
       </span>
     </section>
 
@@ -62,8 +42,8 @@
         <div class="hand">
         </div>
         <div id="sideControl" class="sideControl" >
-          <em>Score: </em> <p class="scoreHolder">000</p> <br>
-          <p id="playerWallet">000.00</p>
+          <p id="playerWallet">000.00</p> <br>
+          <em>Score: </em> <p class="scoreHolder">000</p>
           <button class="hitStay pan0" onclick="GameDirector.hitPlayer(0)" disabled>Hit</button>
           <button class="hitStay pan0" onclick="GameDirector.stayPlayer(0)" disabled>Stay</button>
           <button class="hitStay pan0" onclick="GameDirector.doublePlayer(0)" disabled>Double</button>
