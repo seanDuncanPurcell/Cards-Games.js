@@ -127,7 +127,6 @@ class Table {
         logString += " - 10";
       }
     }
-    // console.log(`player${input} with ${logString} = ${value} AceCounter = ${aceCounter}`);
     handVal[y] = value;
   }
   dealCard(input){
@@ -209,12 +208,14 @@ const Interface = (function () {
       for (hand of _hands){
         hand.innerHTML = '';
       }
+
+
     },
     dispBetMod () {
       setTimeout(()=>{
         const elmt = document.querySelector("#betBtnHolder");
         elmt.style.display = 'flex';
-        _noticeDisply.innerText = "Place a Bet"
+        _noticeDisply.innerText = "Place a Bet";
       }, 1250);
     },
     hideBetMod () {
@@ -228,14 +229,13 @@ const Interface = (function () {
       document.getElementById('sideControl').style.display = 'none'
     },
     hideModules () {
-      console.log("hide modules called");
       const covers = document.getElementsByClassName("cover");
       for (let elmn of covers) {
         elmn.style.display = "none";
       }
     },
     setScore (value, i) {
-      const scoreHolders = document.getElementsByClassName("scoreHolder")
+      const scoreHolders = document.getElementsByClassName("scoreHolder");
       scoreHolders[i].innerHTML = value;
     },
     setWallet (num) {
@@ -245,7 +245,6 @@ const Interface = (function () {
     },
     setHandBlocker (result, i, time = 750) {
       setTimeout(()=>{
-        console.log("handBlocker called");
         const elmt = document.getElementById(`handBlocker${i}`);
         elmt.innerHTML = result;
         this.btnsDisable(i);
@@ -280,6 +279,17 @@ const Interface = (function () {
       document.getElementById('sideControl').style.display = 'none';
       return _noticeDisply;
     },
+    emfClickable (element) {
+      element.style.cursor = "pointer";
+      element.addEventListener('mouseover', hvrPointer = evt => { evt.target.style.transform = "scale(1.05)" } );
+      element.addEventListener('mouseout', noHvrPointer = evt => { evt.target.style.transform = "scale(1)" } );
+    },
+    demfClickable (element) {
+      element.style.cursor = "default";
+      element.style.transform = "scale(1)";
+      element.removeEventListener('mouseover', hvrPointer );
+      element.removeEventListener('mouseout', noHvrPointer );
+    }
   }
 })();
 
@@ -293,7 +303,8 @@ const GameDirector = (function(){
   const _players = _table.players;
 
   const _clearTable = () => {    
-    document.getElementById("resultsDisplay").removeEventListener('click', _clearTable );
+    const elmt = document.getElementById("resultsDisplay");
+    elmt.removeEventListener('click', _clearTable );
     const allHands = [_players[0].hands, _players[1].hands];
     document.getElementById('splitArea').style.display ='none'; 
     document.getElementById('sideControl').style.display = 'none';
@@ -310,15 +321,20 @@ const GameDirector = (function(){
 
     Interface.clearHands();
 
-    const elmt = document.getElementById("resultsDisplay");
     elmt.addEventListener('click', _firstDeal);
     elmt.innerText = "Deal Cards";
     Interface.hideModules();
   }
   const _firstDeal = () => {
+    const btn = document.getElementById('resultsDisplay');
     const time = 500;
     const strtCards = 4;
     let i = 1;
+
+    btn.removeEventListener('click', _firstDeal);
+    Interface.demfClickable(btn);
+
+    //wait between dealing cards so player can see it happening;
     setTimeout( async function firstdeal () {
       const player = i % 2;
       let crd = await _dealCard([player, 0]);
@@ -327,15 +343,15 @@ const GameDirector = (function(){
       i++;
     }, time);
 
-    document.getElementById('resultsDisplay')
-    .removeEventListener('click', _firstDeal);
-
     Interface.dispBetMod();
+
     setTimeout(()=>{
       document.getElementById('sideControl').style.display = 'block';
     }, 2000); 
   }
   const _dealCard = async (input) => {
+    Interface.setScore('00', 0)
+
     if (_deck.reportCards().length <= 1) _deck.shuffleDiscards();
 
     const [player, hand] = input;
@@ -344,13 +360,9 @@ const GameDirector = (function(){
     
     const element = await Interface.renderCard(card, input);
 
-    console.log(`Player ${player + 1} was dealt a ${card}.`);
-    console.log(`their new hand value is ${handVal}.`);
-
     return element;
   }
   const _dealersTurn = (time = 2000) => {
-    console.log("dealers turn called");
     const dealersIndex = 0; 
     const input = [dealersIndex, 0];
     Interface.flipDealer();
@@ -372,7 +384,6 @@ const GameDirector = (function(){
     }, time);
   }
   const _endRound = () => {
-    console.log('endRound called');
     const dealersIndex = 0; 
     const dealerHand = _players[dealersIndex].handValue[0];
     const playersIndex = 1; 
@@ -385,7 +396,6 @@ const GameDirector = (function(){
       if (playerBets[i] === 0) break;
 
       let result = _handCompare(value, dealerHand);
-      console.log(`endRound called on player hand ${i}: ${result}`);
 
       if (result == "Win"){
         let bet = (playerBets[i] * 2);
@@ -410,10 +420,8 @@ const GameDirector = (function(){
       if (result != undefined) Interface.setHandBlocker(result, i);
     }    
     Interface.setWallet(_players[1].wallet);
-    console.log('wallet show:' + _players[1].wallet);
     document.getElementById("resultsDisplay").addEventListener('click', _clearTable);
     Interface.showRslt(winnings);
-
   }
   const _handCompare = (player, dealer) => {
     let result = "none";
@@ -430,14 +438,16 @@ const GameDirector = (function(){
     let bCard = _players[1].hands[0][1];
     let aRank = aCard.substring(0, aCard.length - 1);
     let bRank = bCard.substring(0, bCard.length - 1);
-    console.log(`${aRank} of ${aCard} & ${bRank} of ${bCard} were looked at by _evalForSplit.`);
+    
     if (aRank !== bRank) {
       document.getElementById('split').setAttribute('disabled', '');
     }
   }  
-  ( gameInt = () => {
-    console.log('gameInt called');
-    Interface.uiInit().addEventListener('click', _firstDeal);
+  (gameInit = () => {
+    const btn = Interface.uiInit();
+    btn.addEventListener('click', _firstDeal);
+    Interface.emfClickable(btn);
+
     Interface.setWallet(_players[1].wallet);
     _deck.shuffleDeck();
   })();

@@ -6,7 +6,13 @@
 button {
   margin: 10px;
   border-radius: 7.4px;
+  cursor: pointer;
 }
+
+button:disabled{
+  cursor: default;
+}
+
 #betBtnHolder{
   display: none;
   justify-content: space-around;
@@ -18,6 +24,10 @@ button {
   width: fit-content;
   height: fit-content;
   padding: 5px;
+}
+
+.betBtns{
+  cursor: pointer;
 }
 
 #table_top {
@@ -84,7 +94,6 @@ section > span{
   padding: 0 1vw 0 1vw;
 }
 
-
 #southEnd {
   position: relative;
   display: flex;
@@ -133,6 +142,7 @@ section > span{
   height: 100%;
   backface-visibility: hidden;
 }
+
 .cardFront{
   transform: rotateY(180deg);
 }
