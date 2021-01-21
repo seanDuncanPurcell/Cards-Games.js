@@ -141,7 +141,7 @@ class Table {
 const Interface = (function () {
   const _hands = document.getElementsByClassName("hand");
   const _noticeDisply = document.getElementById("resultsDisplay");
-  const _newCard = async (suit) => {
+  const _newCard = (suit) => {
     const card = document.createElement("div");
     card.className = "card";
 
@@ -154,11 +154,7 @@ const Interface = (function () {
     let i = 0;
     while(i < imgArr[0].length){
       const img = document.createElement("img");
-      const crdData = await fetch(imgArr[0][i]);
-      if(!crdData.ok) throw new Error('Data failed to load');
-      const blob = await crdData.blob();
-      const svgURL = URL.createObjectURL(blob);
-      img.src = svgURL;
+      img.src = imgArr[0][i];
       img.className = imgArr[1][i];
       card.appendChild(img);
 
@@ -166,27 +162,16 @@ const Interface = (function () {
     }
     return card;
   }
+  
   return {
-    async renderCard (suit, input) {
-      const [player, hand] = input;
 
-      //While running on localhost my GET was being rejected by client, so this re-try block may not be needed in a real server.
-      let count = 0;
-      const maxTries = 3;
-      while(true) {
-        try {
-          const card = await _newCard(suit)
-          _hands[player + hand].appendChild(card);
-          return card;
-        } catch (SomeException) {
-          if (++count == maxTries){
-            console.error(SomeException);
-            break;
-            //alert user of fail and start new hand.
-          }
-        }
-      }      
+    renderCard (suit, input) {
+      const [player, hand] = input;
+      const card = _newCard(suit)
+      _hands[player + hand].appendChild(card);
+      return card;
     },
+
     btnsDisable (i) {
       let btns = document.getElementsByClassName("pan" + i);
 
@@ -195,6 +180,7 @@ const Interface = (function () {
         btns[i].setAttribute('disabled', '');
       }
     },
+
     btnsEnable (i) {
       let btns = document.getElementsByClassName("pan" + i);
 
@@ -203,11 +189,13 @@ const Interface = (function () {
       }
 
     },
+
     clearHands () {
       for (hand of _hands){
         hand.innerHTML = '';
       }
     },
+    
     dispBetMod () {
       setTimeout(()=>{
         const elmt = document.querySelector("#betBtnHolder");
@@ -215,31 +203,37 @@ const Interface = (function () {
         _noticeDisply.innerText = "Place a Bet";
       }, 1250);
     },
+    
     hideBetMod () {
       const elmt = document.querySelector("#betBtnHolder");
       elmt.style.display = 'none';
       _noticeDisply.innerText = 'Your Turn';
     },
+    
     flipDealer() {
       _hands[0].lastChild.classList.add('flip');
       _noticeDisply.innerText = "Dealer's Turn";
       document.getElementById('sideControl').style.display = 'none'
     },
+    
     hideModules () {
       const covers = document.getElementsByClassName("cover");
       for (let elmn of covers) {
         elmn.style.display = "none";
       }
     },
+    
     setScore (value, i) {
       const scoreHolders = document.getElementsByClassName("scoreHolder");
       scoreHolders[i].innerHTML = value;
     },
+    
     setWallet (num) {
       const wallet = document.getElementById("playerWallet");
       const number = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'USD' }).format(num);
       wallet.innerHTML = number;
     },
+    
     setHandBlocker (result, i, time = 750) {
       setTimeout(()=>{
         const elmt = document.getElementById(`handBlocker${i}`);
@@ -248,6 +242,7 @@ const Interface = (function () {
         elmt.parentElement.style.display = 'flex';
       },time);
     },
+    
     setDealerBlocker (text) {
       setTimeout(()=>{
         const elmt = document.getElementById("dealerBlocker");
@@ -255,9 +250,11 @@ const Interface = (function () {
         elmt.parentElement.style.display = 'flex';
       }, 750);
     },
+    
     showRslt (result) {
       _noticeDisply.innerText = result;
     },
+    
     split () {
       const handB = document.getElementById('splitArea');
       handB.style.display ='grid';
@@ -270,17 +267,21 @@ const Interface = (function () {
         card.classList.add('flip');
       } ,250);
 
+    
     },
+    
     uiInit () {
       _noticeDisply.parentElement.style.display = "flex";      
       document.getElementById('sideControl').style.display = 'none';
       return _noticeDisply;
     },
+    
     emfClickable (element) {
       element.style.cursor = "pointer";
       element.addEventListener('mouseover', hvrPointer = evt => { evt.target.style.transform = "scale(1.05)" } );
       element.addEventListener('mouseout', noHvrPointer = evt => { evt.target.style.transform = "scale(1)" } );
     },
+    
     demfClickable (element) {
       element.style.cursor = "default";
       element.style.transform = "scale(1)";
