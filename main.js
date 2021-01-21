@@ -4,7 +4,6 @@
 
 //Add all unfixed bugs to bugs.txt
 
-
 class Player {
   constructor(){
     this.handValue = [0, 0];
@@ -208,8 +207,6 @@ const Interface = (function () {
       for (hand of _hands){
         hand.innerHTML = '';
       }
-
-
     },
     dispBetMod () {
       setTimeout(()=>{
@@ -261,7 +258,7 @@ const Interface = (function () {
     showRslt (result) {
       _noticeDisply.innerText = result;
     },
-    split() {
+    split () {
       const handB = document.getElementById('splitArea');
       handB.style.display ='grid';
       handB.style.position ='relative';
