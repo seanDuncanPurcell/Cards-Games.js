@@ -1,74 +1,67 @@
-<!DOCTYPE html>
-<body>
-  <main id="table_top">
-    <!-- Dealer -->
-    <section class="playerArea">
-      <span class="cover">
-        <span id="dealerBlocker" class="blocker">Sample</span>
+<main id="table_top">
+  <!-- Dealer -->
+  <section class="playerArea">
+    <span class="cover">
+      <span id="dealerBlocker" class="blocker">Sample</span>
+    </span>
+    <div></div>
+    <div class="hand">
+    </div>
+    <div class="sideControl">
+    </div>
+  </section>
+
+  <!-- Center divider -->
+  <section>
+    <span>
+      <span id="resultsDisplay" >Deal Cards</span>
+      <span id="betBtnHolder">
+        <button class="betBtns" onclick="GameDirector.placeBet(10)">$10.00</button>
+        <button class="betBtns" onclick="GameDirector.placeBet(50)">$50.00</button>
+        <button class="betBtns" onclick="GameDirector.placeBet(100)">$100.00</button>
       </span>
-      <div></div>
+    </span>
+  </section>
+
+  <!-- Player -->
+  <section id="southEnd">
+    <div id='handOne' class="playerArea">
+      <span class="cover">
+        <span id="handBlocker0" class="blocker">Sample</span>
+      </span>
+      <div></div> <!-- space holder -->
       <div class="hand">
       </div>
-      <div class="sideControl">
+      <div id="sideControl" class="sideControl" >
+        <p id="playerWallet">000.00</p> <br>
+        <em>Score: </em> <p class="scoreHolder">000</p>
+        <button class="hitStay pan0" onclick="GameDirector.hitPlayer(0)" disabled>Hit</button>
+        <button class="hitStay pan0" onclick="GameDirector.stayPlayer(0)" disabled>Stay</button>
+        <button class="hitStay pan0" onclick="GameDirector.doublePlayer(0)" disabled>Double</button>
+        <button class="hitStay pan0" id="split" onclick="GameDirector.splitPlayer()" disabled>Split</button>
       </div>
-    </section>
-
-    <!-- Center divider -->
-    <section>
-      <span>
-        <span id="resultsDisplay" >Deal Cards</span>
-        <span id="betBtnHolder">
-          <button class="betBtns" onclick="GameDirector.placeBet(10)">$10.00</button>
-          <button class="betBtns" onclick="GameDirector.placeBet(50)">$50.00</button>
-          <button class="betBtns" onclick="GameDirector.placeBet(100)">$100.00</button>
-        </span>
+    </div>
+    <span id="splitArea" class="playerArea">
+      <span class="cover">
+        <span id="handBlocker1" class="blocker">Sample 02</span>
       </span>
-    </section>
-
-    <!-- Player -->
-    <section id="southEnd">
-      <div id='handOne' class="playerArea">
-        <span class="cover">
-          <span id="handBlocker0" class="blocker">Sample</span>
-        </span>
-        <div></div> <!-- space holder -->
-        <div class="hand">
-        </div>
-        <div id="sideControl" class="sideControl" >
-          <p id="playerWallet">000.00</p> <br>
-          <em>Score: </em> <p class="scoreHolder">000</p>
-          <button class="hitStay pan0" onclick="GameDirector.hitPlayer(0)" disabled>Hit</button>
-          <button class="hitStay pan0" onclick="GameDirector.stayPlayer(0)" disabled>Stay</button>
-          <button class="hitStay pan0" onclick="GameDirector.doublePlayer(0)" disabled>Double</button>
-          <button class="hitStay pan0" id="split" onclick="GameDirector.splitPlayer()" disabled>Split</button>
-        </div>
+      <div></div> <!-- space holder -->
+      <div class="hand">
       </div>
-      <span class="playerArea" id="splitArea">
-        <span class="cover">
-          <span id="handBlocker1" class="blocker">Sample 02</span>
-        </span>
-        <div></div> <!-- space holder -->
-        <div class="hand">
-        </div>
-        <div id="sideControl2" class="sideControl">
-          <em>Score: </em> <p class="scoreHolder">000</p> <br>
-          <button class="hitStay pan1" onclick="GameDirector.hitPlayer(1)" disabled>Hit</button>
-          <button class="hitStay pan1" onclick="GameDirector.stayPlayer(1)" disabled>Stay</button>
-          <button class="hitStay pan1" onclick="GameDirector.doublePlayer(1)" disabled>Double</button>
-        </div>
-      </span>        
-    </section>
-  </main>
-  
-
-</div>
-  <footer>
-    <p>
-      Game behavior and display defined at my <a href="https://github.com/seanDuncanPurcell/Cards-Games.js">GitHub repo. 'Cards-Games.js'</a>. <br>
-      Card SVG images sourced via <a href="https://commons.wikimedia.org/wiki/File:2H.svg">Adrian Kennard</a>, CC0, via Wikimedia Commons.
-    </p>
-  </footer>
-  <script src="./main.js"></script>
-  <link rel="stylesheet" href="./cardTable.css">
-</body>
-</html>
+      <div id="sideControl2" class="sideControl">
+        <em>Score: </em> <p class="scoreHolder">000</p> <br>
+        <button class="hitStay pan1" onclick="GameDirector.hitPlayer(1)" disabled>Hit</button>
+        <button class="hitStay pan1" onclick="GameDirector.stayPlayer(1)" disabled>Stay</button>
+        <button class="hitStay pan1" onclick="GameDirector.doublePlayer(1)" disabled>Double</button>
+      </div>
+    </span>        
+  </section>
+</main>
+<footer>
+  <p>
+    Game behavior and display defined at my <a href="https://github.com/seanDuncanPurcell/Cards-Games.js">GitHub repo. 'Cards-Games.js'</a>. <br>
+    Card SVG images sourced via <a href="https://commons.wikimedia.org/wiki/File:2H.svg">Adrian Kennard</a>, CC0, via Wikimedia Commons.
+  </p>
+</footer>
+<script src="/projects/blackJack/main.js"></script>
+<link rel="stylesheet" href="/projects/blackJack/cardTable.css">
