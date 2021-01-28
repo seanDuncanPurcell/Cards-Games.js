@@ -147,7 +147,7 @@ const Interface = (function () {
 
     const imgArr = 
     [
-      [`./img/${suit}.svg`, "./img/Card_back_01.svg"],
+      [`./black-jack/img/${suit}.svg`, "./black-jack/img/Card_back_01.svg"],
       ["cardFront", "cardBack"]
     ];
 
@@ -442,6 +442,13 @@ const GameDirector = (function(){
     }
   }  
   (gameInit = () => {
+    const betBtns = ['betBtn10d', 'betBtn50d', 'betBtn100d']
+    betBtns.forEach( btn => {
+      const element = document.getElementById(btn);
+      const bet = element.getAttribute('data-betAmount');
+      element.addEventListener('click', () => GameDirector.placeBet(bet) );
+      console.log( 'event listener added to btn on click for ammount' + bet );
+    });
     const btn = Interface.uiInit();
     btn.addEventListener('click', _firstDeal);
     Interface.emfClickable(btn);
