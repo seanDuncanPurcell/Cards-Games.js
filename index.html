@@ -37,10 +37,10 @@
         <div id="sideControl" class="sideControl" >
           <p id="playerWallet">000.00</p> <br>
           <em>Score: </em> <p class="scoreHolder">000</p>
-          <button class="hitStay pan0" onclick="GameDirector.hitPlayer(0)" disabled>Hit</button>
-          <button class="hitStay pan0" onclick="GameDirector.stayPlayer(0)" disabled>Stay</button>
-          <button class="hitStay pan0" onclick="GameDirector.doublePlayer(0)" disabled>Double</button>
-          <button class="hitStay pan0" id="split" onclick="GameDirector.splitPlayer()" disabled>Split</button>
+          <button class="hitStay pan0" btn-type="hit" disabled>Hit</button>
+          <button class="hitStay pan0" btn-type="stay" disabled>Stay</button>
+          <button class="hitStay pan0" btn-type="double" disabled>Double</button>
+          <button class="hitStay pan0" btn-type="split" id="split" disabled>Split</button>
         </div>
       </div>
       <span class="playerArea" id="splitArea">
@@ -52,9 +52,9 @@
         </div>
         <div id="sideControl2" class="sideControl">
           <em>Score: </em> <p class="scoreHolder">000</p> <br>
-          <button class="hitStay pan1" onclick="GameDirector.hitPlayer(1)" disabled>Hit</button>
-          <button class="hitStay pan1" onclick="GameDirector.stayPlayer(1)" disabled>Stay</button>
-          <button class="hitStay pan1" onclick="GameDirector.doublePlayer(1)" disabled>Double</button>
+          <button class="hitStay pan1" btn-type="hit" disabled>Hit</button>
+          <button class="hitStay pan1" btn-type="stay" disabled>Stay</button>
+          <button class="hitStay pan1" btn-type="double"  disabled>Double</button>
         </div>
       </span>        
     </section>

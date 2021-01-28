@@ -4,6 +4,8 @@
 
 //Add all unfixed bugs to bugs.txt
 
+//maybe I can move the winning message into the hand blockers and have result display offter to deal anther hand.
+
 class Player {
   constructor(){
     this.handValue = [0, 0];
@@ -442,6 +444,8 @@ const GameDirector = (function(){
     }
   }  
   (gameInit = () => {
+
+    //attach event listener to betting buttons
     const betBtns = ['betBtn10d', 'betBtn50d', 'betBtn100d']
     betBtns.forEach( btn => {
       const element = document.getElementById(btn);
@@ -449,6 +453,21 @@ const GameDirector = (function(){
       element.addEventListener('click', () => GameDirector.placeBet(bet) );
       console.log( 'event listener added to btn on click for ammount' + bet );
     });
+
+    //attach event listener to player actions buttons
+    const plyActBtns = document.querySelectorAll('.hitStay');
+    plyActBtns.forEach( btn => {
+      const type = btn.getAttribute('btn-type');
+      const pos = (btn.classList[1] === 'pan0') ? 0 : 1 ;
+      btn.addEventListener('click', () => {
+        if(type === 'hit') GameDirector.hitPlayer(pos);
+        else if(type === 'stay') GameDirector.stayPlayer(pos);
+        else if (type === 'double') GameDirector.doublePlayer(pos);
+        else if (type === 'split') GameDirector.splitPlayer();
+        else console.warn('gameInit failed to properly attach listeners');
+      })
+    });
+
     const btn = Interface.uiInit();
     btn.addEventListener('click', _firstDeal);
     Interface.emfClickable(btn);
